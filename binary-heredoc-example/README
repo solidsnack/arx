@@ -1,0 +1,14 @@
+The file ./raw contains all two byte sequences and ./all-byte-pairs.sh is a
+shell script with all such sequences encoded in a HERE document, along with a
+decoder.
+
+Run it to capture the output for comparison:
+
+ :; ./all-byte-pairs.sh > output
+
+Use ./xxdiff.bash to get a hex diff of ./raw and the output, byte by byte:
+
+ :; ./xxdiff.bash ./raw ./output
+
+There should be no difference.
+
