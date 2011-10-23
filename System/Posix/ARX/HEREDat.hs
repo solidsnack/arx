@@ -78,7 +78,7 @@ chunk block
                                              (EscapeChar eW (octal eW) eSed)
  where
   (nW, nSed):(eW, eSed):_    =  snd <$> List.sortBy (comparing cmp) counts
-  cmp (count, (w, s))        =  (count, w)
+  cmp (count, (w, _))        =  (count, w)
   counts                     =  countAndBundle <$> escapes
    where
     countAndBundle (w, s)    =  (Bytes.count w block, (w, s))
