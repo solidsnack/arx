@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings
+           , FlexibleInstances
            , StandaloneDeriving #-}
-{-| Utilities for working with shell script. 
+{-| Utilities for working with shell script.
  -}
 module System.Posix.ARX.Sh where
 
