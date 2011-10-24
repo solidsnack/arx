@@ -1,3 +1,6 @@
+{-# LANGUAGE OverloadedStrings
+           , TypeFamilies
+           , StandaloneDeriving #-}
 
 module System.Posix.ARX where
 
