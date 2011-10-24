@@ -9,22 +9,20 @@ import System.Exit
 
 import qualified Blaze.ByteString.Builder as Blaze
 
-import System.Posix.ARX.HEREDat
+import qualified System.Posix.ARX as ARX
+import qualified System.Posix.ARX.Sh as ARX (setEU)
 
 
 main                         =  do
   ["shbin"]                 <-  getArgs
   input                     <-  LazyB.getContents
-  let chunks                 =  chunked input
-  mapM_ (LazyB.putStr . Blaze.toLazyByteString) chunks
+  let output                 =  ARX.interpret (ARX.SHBIN chunkSize) input
+  (LazyB.putStr . Blaze.toLazyByteString) output
   exitSuccess
  where
-  chunkSize                  =   0x400000 -- 4M
-  -- chunkSize                  =  0x20000 -- 128K
-  chunked input              =  case LazyB.splitAt chunkSize input of
-    ("", "")                ->  []
-    (a , "")                ->  [chunkIt a]
-    (a ,  b)                ->  chunkIt a : chunked b
-   where  
-    chunkIt                  =  script . chunk . mconcat . LazyB.toChunks
+  chunkSize                  =  0x20000 -- 128K
+  -- chunkSize                  =  0x40000 -- 256K
+  -- chunkSize                  =  0x80000 -- 512K
+  -- chunkSize                  =  0x100000 -- 1M
+  -- chunkSize                  =  0x400000 -- 4M
 
