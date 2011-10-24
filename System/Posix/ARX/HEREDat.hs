@@ -73,15 +73,14 @@ instance IsString Chunk where
 chunk block
   | safeForHereDoc block     =  SafeChunk block
   | otherwise                =  EncodedChunk (encode nW eW block)
-                                             (Bytes.length block)
-                                             (EscapeChar nW (octal nW) nSed)
-                                             (EscapeChar eW (octal eW) eSed)
+                                             (Bytes.length block) nEsc eEsc
  where
-  (nW, nSed):(eW, eSed):_    =  snd <$> List.sortBy (comparing cmp) counts
-  cmp (count, (w, _))        =  (count, w)
+  nEsc@(EscapeChar nW _ _ _) :
+    eEsc@(EscapeChar eW _ _ _) : _ = snd <$> List.sortBy (comparing cmp) counts
+  cmp (count, EscapeChar w _ _ _) = (count, w)
   counts                     =  countAndBundle <$> escapes
    where
-    countAndBundle (w, s)    =  (Bytes.count w block, (w, s))
+    countAndBundle e@(EscapeChar w _ _ _) = (Bytes.count w block, e)
 
 {-| Given a byte to replace nulls and an escape byte, rewrites the data such
     that nulls are mapped to the replace byte, replace bytes are mapped to a
@@ -147,32 +146,46 @@ decode nullReplaceByte escapeByte = (unEscape . Bytes.map unReplace)
     - interpret the double escape sequence and unset the escape flag.
     -}
 
---  ! " # $ % & '    * + , - . /    : ;    ? @    \    `    ~
-{-| The escape candidate characters, paired with forms suitable for inclusion
-    in Sed scripts.
- -}
-escapes                     ::  [(Word8, ByteString)]
-escapes                      =  first Bytes.c2w <$>
-                                  [ ('!',"!"),  ('"',"\""),
-                                    ('#',"#"),  ('$',"\\$"),
-                                    ('%',"%"),  ('&',"\\&"),
-                                    ('\'',"'"), ('*',"*"),
-                                    ('+',"+"),  (',',","),
-                                    ('-',"-"),  ('.',"\\."),
-                                    ('/',"/"),  (':',":"),
-                                    (';',";"),  ('?',"\\?"),
-                                    ('@',"@"),  ('\\',"\\\\"),
-                                    ('`',"`"),  ('~',"~")      ]
+data EscapeChar = EscapeChar !Word8 !ByteString -- ^ For @tr@.
+                                    !ByteString -- ^ For @sed@ pattern.
+                                    !ByteString -- ^ For @sed@ replacement.
+deriving instance Show EscapeChar
 
-{-| Present a 'Word8' as an octal literal, suitable for use with @tr@. 
+{-| The candidate escape characters, with the forms to be used in constructed
+    @tr@ and @sed@ commands.
  -}
-octal                       ::  Word8 -> ByteString
-octal w = Data.ByteString.Char8.pack $ case s of []    -> "\\000"
-                                                 [_]   -> "\\00" ++ s
-                                                 [_,_] -> "\\0" ++ s
-                                                 _     -> "\\" ++ s
- where
-  s                          =  showOct w ""
+escapes                     ::  [EscapeChar]
+escapes                      =  [EscapeChar  0x21  "!"    "!"    "!",
+                                 EscapeChar  0x22  "\""   "\""   "\"",
+                                 EscapeChar  0x23  "#"    "#"    "#",
+                                 EscapeChar  0x24  "$"    "[$]"  "$",
+                                 EscapeChar  0x25  "%"    "%"    "%",
+                                 EscapeChar  0x26  "&"    "&"    "\\&",
+
+                                 EscapeChar  0x2a  "*"    "[*]"  "*",
+                                 EscapeChar  0x2b  "+"    "[+]"  "+",
+                                 EscapeChar  0x2c  ","    ","    ",",
+                                 EscapeChar  0x2d  "-"    "-"    "-",
+                                 EscapeChar  0x2e  "."    "[.]"  ".",
+                                 EscapeChar  0x2f  "/"    "/"    "/",
+
+                                 EscapeChar  0x3a  ":"    ":"    ":",
+                                 EscapeChar  0x3b  ";"    ";"    ";",
+
+                                 EscapeChar  0x3d  "="    "="    "=",
+
+                                 EscapeChar  0x3f  "?"    "[?]"  "?",
+                                 EscapeChar  0x40  "@"    "@"    "@",
+
+                                 EscapeChar  0x5c  "\\\\" "\\\\" "\\\\",
+
+                                 EscapeChar  0x60  "`"    "`"    "`",
+
+                                 EscapeChar  0x7e  "~"    "~"    "~"]
+{- We use character classes instead of \ for many characters on the pattern
+ - side because \ turns special behaviour on in basic mode and off in extended
+ - mode, an ambiguity that, I feel, is best not to have to think about.
+ -}
 
 {-| Many binary strings can be embedded as-is in a HEREDOC, without escaping.
  -}
@@ -186,11 +199,6 @@ encoded                     ::  Chunk -> Bool
 encoded (SafeChunk _)        =  False
 encoded (EncodedChunk _ _ _ _) = True
 
-data EscapeChar              =  EscapeChar !Word8      -- ^ ASCII value.
-                                           !ByteString -- ^ Form for @tr@.
-                                           !ByteString -- ^ Form for @sed@.
-deriving instance Show EscapeChar
-
 {-|  
  -}
 script chunk                 =  mconcat $ case chunk of
@@ -198,15 +206,16 @@ script chunk                 =  mconcat $ case chunk of
    where
     len                      =  Bytes.length bytes
     eof                      =  blz (leastStringNotIn bytes)
-  EncodedChunk bytes len (EscapeChar _ trN sedN) (EscapeChar b _ sedE) ->
+  EncodedChunk bytes len
+               (EscapeChar _ trN _ sedRN) (EscapeChar b _ sedPE sedRE) ->
     [ blz "{ ",       blaze tr,
       blz " | ",      blaze sed,
       blz " | ",      clip len,
       blz " ;}",      dataSection (Blaze.fromWord8 b) bytes ]
    where
     tr                       =  ["tr '", trN, "' '\\000'"]
-    sed                      =  ["sed '","s|",sedE,sedE,"|",sedN,"|g", " ; ",
-                                         "s|",sedE,"_", "|",sedE,"|g", "'"    ]
+    sed                      =  ["sed '","s|",sedPE,sedPE,"|",sedRN,"|g"," ; ",
+                                         "s|",sedPE, "_", "|",sedRE,"|g", "'"]
  where
   blaze                      =  mconcat . (Blaze.fromByteString <$>)
   blz                        =  Blaze.fromByteString
