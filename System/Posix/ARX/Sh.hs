@@ -28,7 +28,7 @@ instance Render Val where
   render (Val bytes) = (Blaze.fromByteString . Esc.bytes . Esc.sh) bytes
 
 val                         ::  ByteString -> Maybe Val
-val bytes = guard (Bytes.all (/= '0') bytes) >> Just (Val bytes)
+val bytes = guard (Bytes.all (/= '\0') bytes) >> Just (Val bytes)
 
 {-| Valid shell variable names consist of a leading letter or underscore and
     then any number of letters, underscores or digits. 
