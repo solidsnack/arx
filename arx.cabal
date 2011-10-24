@@ -19,7 +19,7 @@ source-repository               head
 
 
 flag no-cli
-  description                 : Enable command line tool.
+  description                 : Disable command line tool.
   default                     : False
 
 
