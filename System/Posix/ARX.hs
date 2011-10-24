@@ -19,7 +19,7 @@ import System.Posix.ARX.HEREDat
 import qualified System.Posix.ARX.Sh as Sh
 
 
-{-| ARX subprograms process some input to produce a script. 
+{-| ARX subprograms process some input to produce a script.
  -}
 class ARX program where
   type Input program        ::  *
@@ -31,7 +31,7 @@ class ARX program where
 newtype SHBIN                =  SHBIN Word  -- ^ Chunk size.
 instance ARX SHBIN where
   type Input SHBIN           =  LazyB.ByteString
-  interpret (SHBIN w) bytes  =  mconcat ["{\n", mconcat (chunked bytes), "}"]
+  interpret (SHBIN w) bytes  =  mconcat (chunked bytes)
    where
     chunkSize                =  min (fromIntegral w) maxBound
     chunked input            =  case LazyB.splitAt chunkSize input of
@@ -62,10 +62,13 @@ instance ARX TMPX where
    where
     archives stuff           =  case stuff of
       [            ]        ->  []
-      (tag, bytes):t        ->  interpret encoder bytes : tar tag : archives t
-    tar TAR                  =  " | tar x\n"
-    tar TGZ                  =  " | tar xz\n"
-    tar TBZ                  =  " | tar xj\n"
+      (tar, bytes):t        ->  archive tar bytes : archives t
+     where
+      archive tar bytes      =  mconcat
+        ["{\n", interpret encoder bytes, "} | tar ", flags tar, "\n"]
+      flags TAR              =  "-x"
+      flags TGZ              =  "-x -z"
+      flags TBZ              =  "-x -j"
 
 
 {-| Handled styles of Tar archive.
