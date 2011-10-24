@@ -1,0 +1,64 @@
+name                          : arx
+version                       : 0.0.0
+category                      : Text
+license                       : BSD3
+license-file                  : LICENSE
+author                        : Jason Dusek
+maintainer                    : oss@solidsnack.be
+homepage                      : http://github.com/solidsnack/arx/
+synopsis                      : Archive execution tool.
+description                   : Archive execution tool.
+
+cabal-version                 : >= 1.6
+build-type                    : Simple
+extra-source-files            : README
+
+source-repository               head
+  type                        : git
+  location                    : http://github.com/solidsnack/arx.git
+
+
+flag no-cli
+  description                 : Enable command line tool.
+  default                     : False
+
+
+library
+  build-depends               : base >= 2 && <= 5
+                              , containers
+                              , bytestring >= 0.9
+                              , blaze-builder >= 0.3
+                              , bytestring-nums >= 0.3.3
+                              , shell-escape >= 0.1.1
+                              , vector >= 0.9
+                              , vector-algorithms >= 0.5.3
+  exposed-modules             : System.Posix.ARX
+                                System.Posix.ARX.HEREDat
+                                System.Posix.ARX.Sh
+  extensions                  : FlexibleInstances
+                                OverloadedStrings
+                                StandaloneDeriving
+                                TupleSections
+                                TypeFamilies
+
+
+executable                      arx
+  main-is                     : arx.hs
+  if flag(no-cli)
+    buildable                 : False
+  else
+    buildable                 : True
+  build-depends               : base >= 2 && <= 5
+                              , containers
+                              , bytestring >= 0.9
+                              , blaze-builder >= 0.3
+                              , bytestring-nums >= 0.3.3
+                              , shell-escape >= 0.1.1
+                              , vector >= 0.9
+                              , vector-algorithms >= 0.5.3
+  extensions                  : FlexibleInstances
+                                OverloadedStrings
+                                StandaloneDeriving
+                                TupleSections
+                                TypeFamilies
+
