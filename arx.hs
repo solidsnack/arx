@@ -14,9 +14,9 @@ import qualified System.Posix.ARX.Sh as ARX (setEU)
 
 
 main                         =  do
-  ["shbin"]                 <-  getArgs
+  ["shdat"]                 <-  getArgs
   input                     <-  LazyB.getContents
-  let output                 =  ARX.interpret (ARX.SHBIN chunkSize) input
+  let output                 =  ARX.interpret (ARX.SHDAT chunkSize) input
   (LazyB.putStr . Blaze.toLazyByteString) output
   exitSuccess
  where

@@ -25,13 +25,14 @@ class ARX program where
   type Input program        ::  *
   interpret                 ::  program -> Input program -> Blaze.Builder
 
-{-| An 'SHBIN' program processes byte streams with the specified chunking to
+
+{-| An 'SHDAT' program processes byte streams with the specified chunking to
     produce a script. 
  -}
-newtype SHBIN                =  SHBIN Word  -- ^ Chunk size.
-instance ARX SHBIN where
-  type Input SHBIN           =  LazyB.ByteString
-  interpret (SHBIN w) bytes  =  mconcat (chunked bytes)
+newtype SHDAT                =  SHDAT Word  -- ^ Chunk size.
+instance ARX SHDAT where
+  type Input SHDAT           =  LazyB.ByteString
+  interpret (SHDAT w) bytes  =  mconcat (chunked bytes)
    where
     chunkSize                =  min (fromIntegral w) maxBound
     chunked input            =  case LazyB.splitAt chunkSize input of
@@ -46,7 +47,7 @@ instance ARX SHBIN where
     data in a temporary location and runs the command with the attached
     environment information.
  -}
-data TMPX                    =  TMPX SHBIN [Sh.Val] [(Sh.Var, Sh.Val)]
+data TMPX                    =  TMPX SHDAT [Sh.Val] [(Sh.Var, Sh.Val)]
 instance ARX TMPX where
   type Input TMPX            =  [(Tar, LazyB.ByteString)]
   interpret (TMPX encoder cmd env) stuff = (mconcat . map (`mappend` "\n"))
