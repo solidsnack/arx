@@ -29,7 +29,9 @@ library
                               , bytestring >= 0.9
                               , blaze-builder >= 0.3
                               , bytestring-nums >= 0.3.3
+                              , file-embed >= 0.0.4.1
                               , shell-escape >= 0.1.1
+                              , template-haskell
                               , vector >= 0.9
                               , vector-algorithms >= 0.5.3
   exposed-modules             : System.Posix.ARX
@@ -53,7 +55,9 @@ executable                      arx
                               , bytestring >= 0.9
                               , blaze-builder >= 0.3
                               , bytestring-nums >= 0.3.3
+                              , file-embed >= 0.0.4.1
                               , shell-escape >= 0.1.1
+                              , template-haskell
                               , vector >= 0.9
                               , vector-algorithms >= 0.5.3
   extensions                  : FlexibleInstances

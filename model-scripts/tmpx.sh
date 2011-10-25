@@ -1,6 +1,7 @@
 set -e -u
 unset rm_ dir
-tmp=true ; run=true ; rm0=true ; rm1=true # To be set by tool.
+tmp=true ; run=true
+rm0=true ; rm1=true # To be set by tool.
 for arg in "$@"
 do
   case "$arg" in
@@ -21,7 +22,9 @@ fi
 unpack_run_and_env () {
  : # To be set by tool.
 } ; unpack_run_and_env
-mkdir dat && cd dat
+chmod ug+x ./run
+mkdir dat
+cd dat
 unpack_data () {
  : # To be set by tool.
 } ; unpack_data
