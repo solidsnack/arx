@@ -30,6 +30,8 @@ import qualified Data.Vector.Unboxed as Vector
 import qualified Data.Vector.Unboxed.Mutable as Vector
 import qualified Data.Vector.Algorithms.Intro as Vector
 
+import System.Posix.ARX.BlazeIsString
+
 
 {-| A chunk describes a block of binary data ready for inclusion in a shell
     script. For many data blocks, no encoding or decoding is necessary; these
@@ -208,21 +210,18 @@ script chunk                 =  mconcat $ case chunk of
     eof                      =  blz (leastStringNotIn bytes)
   EncodedChunk bytes len
                (EscapeChar _ trN _ sedRN) (EscapeChar b _ sedPE sedRE) ->
-    [ blz "{ ",       blaze tr,
-      blz " | ",      blaze sed,
-      blz " | ",      clip len,
-      blz " ;}",      dataSection (Blaze.fromWord8 b) bytes ]
+    [ "{ ", mconcat tr, " | ", mconcat sed, " | ", clip len, " ;}",
+      dataSection (Blaze.fromWord8 b) bytes ]
    where
-    tr                       =  ["tr '", trN, "' '\\000'"]
-    sed                      =  ["sed '","s|",sedPE,sedPE,"|",sedRN,"|g"," ; ",
-                                         "s|",sedPE, "_", "|",sedRE,"|g", "'"]
+    tr                       =  ["tr '", blz trN, "' '\\000'"]
+    (e, e', n)               =  (blz sedPE, blz sedRE, blz sedRN)
+    sed                      =  ["sed '","s|",e, e, "|",n, "|g",
+                                   " ; ","s|",e,"_","|",e',"|g","'"]
  where
-  blaze                      =  mconcat . (Blaze.fromByteString <$>)
   blz                        =  Blaze.fromByteString
   nl                         =  Blaze.fromChar '\n'
-  dataSection eof bytes      =  mconcat
-    [blz " <<\\", eof, nl, blz bytes, nl, eof, nl]
-  clip len                   =  blz "head -c " `mappend` Blaze.fromShow len
+  dataSection eof bytes = mconcat [" <<\\", eof, nl, blz bytes, nl, eof, nl]
+  clip len                   =  "head -c " `mappend` Blaze.fromShow len
 
 {-| Finds a short hexadecimal string that is not in the input.
 
