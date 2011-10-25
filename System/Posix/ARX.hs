@@ -50,16 +50,19 @@ instance ARX SHDAT where
 data TMPX                    =  TMPX SHDAT [Sh.Val] [(Sh.Var, Sh.Val)]
 instance ARX TMPX where
   type Input TMPX            =  [(Tar, LazyB.ByteString)]
-  interpret (TMPX encoder cmd env) stuff = (mconcat . map (`mappend` "\n"))
-    [ "d=/tmp/tmpx.`date -u +%FT%TZ`.$$",
-      "trap \"rm -rf $d\" EXIT",
-      "rm -rf $d",
-      "mkdir $d",
-      "cd $d",
+  interpret (TMPX encoder cmd env) stuff = mconcat
+    [ "d=/tmp/tmpx.`date -u +%FT%TZ`.$$\n",
+      "trap \"rm -rf $d\" EXIT\n",
+      "rm -rf $d\n",
+      "mkdir $d\n",
+      "cd $d\n",
       mconcat (archives stuff),
-      "[ $# != 0 ] || set -- " `mappend` Sh.render cmd,
-      "( \"$@\" )",
-      "exit $?" ]
+      "[ $# != 0 ] || set -- " `mappend` Sh.render cmd `mappend` "\n",
+      "( # User may trap/set whatever they like...\n",
+      Sh.render env,
+      "\"$@\"\n",
+      ") # ...in their own shell.\n",
+      "exit $?\n" ]
    where
     archives stuff           =  case stuff of
       [            ]        ->  []
