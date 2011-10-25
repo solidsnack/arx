@@ -45,12 +45,16 @@ instance ARX SHDAT where
 
 {-| A 'TMPX' program archive streams to produce a script that unpacks the file
     data in a temporary location and runs the command with the attached
-    environment information.
+    environment information. A 'TMPX' constructor provides an @execve@ like
+    interface, allowing one to specify an argument vector and environment
+    bindings that will be interpreted as literal values (not interpreted by
+    the shell).
  -}
 data TMPX                    =  TMPX SHDAT [Sh.Val] [(Sh.Var, Sh.Val)]
 instance ARX TMPX where
   type Input TMPX            =  [(Tar, LazyB.ByteString)]
-  interpret (TMPX encoder cmd env) stuff = mconcat
+  interpret (TMPX encoder cmd env) stuff = TMPXTools.toBuilder
+    TMPXTools.Template rm0 rm1 () ()
     [ "d=/tmp/tmpx.`date -u +%FT%TZ`.$$\n",
       "trap \"rm -rf $d\" EXIT\n",
       "rm -rf $d\n",

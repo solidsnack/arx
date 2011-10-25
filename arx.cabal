@@ -25,10 +25,11 @@ flag no-cli
 
 library
   build-depends               : base >= 2 && <= 5
-                              , containers
                               , bytestring >= 0.9
+                              , containers
                               , blaze-builder >= 0.3
                               , bytestring-nums >= 0.3.3
+                              , bzlib >= 0.5
                               , file-embed >= 0.0.4.1
                               , shell-escape >= 0.1.1
                               , template-haskell
@@ -51,10 +52,11 @@ executable                      arx
   else
     buildable                 : True
   build-depends               : base >= 2 && <= 5
-                              , containers
                               , bytestring >= 0.9
+                              , containers
                               , blaze-builder >= 0.3
                               , bytestring-nums >= 0.3.3
+                              , bzlib >= 0.5
                               , file-embed >= 0.0.4.1
                               , shell-escape >= 0.1.1
                               , template-haskell
