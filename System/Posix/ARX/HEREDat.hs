@@ -146,7 +146,7 @@ decode nullReplaceByte escapeByte = (unEscape . Bytes.map unReplace)
     - interpret the double escape sequence and unset the escape flag.
     -}
 
-data EscapeChar = EscapeChar !Word8 !ByteString -- ^ For @tr@.
+data EscapeChar = EscapeChar !Word8 !ByteString -- ^ For @tr@ char list.
                                     !ByteString -- ^ For @sed@ pattern.
                                     !ByteString -- ^ For @sed@ replacement.
 deriving instance Show EscapeChar
