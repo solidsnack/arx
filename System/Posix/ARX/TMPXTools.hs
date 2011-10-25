@@ -2,7 +2,7 @@
            , RecordWildCards
            , PatternGuards   #-}
 
-module System.Posix.ARX.TMPX where
+module System.Posix.ARX.TMPXTools where
 
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as Bytes
