@@ -19,10 +19,12 @@ then
   mkdir $dir
   cd $dir
 fi
-unpack_run_and_env () {
+unpack_env () {
  : # To be set by tool.
-} ; unpack_run_and_env
-chmod ug+x ./run
+} ; unpack_env > ./env
+unpack_run () {
+ : # To be set by tool.
+} ; unpack_run > ./run ; chmod ug+x ./run
 mkdir dat
 cd dat
 unpack_data () {

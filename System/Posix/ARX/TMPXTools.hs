@@ -16,36 +16,34 @@ import Data.FileEmbed
 import System.Posix.ARX.BlazeIsString
 
 
-data Template = Template { rm0 :: Bool, {-^ Remove tmp on task success?   -}
-                           rm1 :: Bool, {-^ Remove tmp on task error?     -}
-                           tsk :: Blaze.Builder, {-^ Task unpacking text. -}
+data Template = Template { rm0 :: Bool, {-^ Remove tmp on run success?    -}
+                           rm1 :: Bool, {-^ Remove tmp on run error?      -}
+                           env :: Blaze.Builder, {-^ Stream for env text. -}
+                           run :: Blaze.Builder, {-^ Stream for run text. -}
                            dat :: Blaze.Builder  {-^ Data unpacking text. -} }
 instance Show Template where
   show Template{..} =
-    "Template { rm0=" ++ tf rm0 ++ " rm1=" ++ tf rm1 ++ " tsk=... dat=... }"
+    "Template { rm0=" ++ tf rm0 ++ " rm1=" ++ tf rm1 ++ " ... }"
    where
     tf True                  =  "true"
     tf False                 =  "false"
 
-toBuilder                   ::  Template -> Blaze.Builder
-toBuilder Template{..}       =  mconcat [ blaze a,
+render                      ::  Template -> Blaze.Builder
+render Template{..}          =  mconcat [ blaze a,
                                           flags, 
                                           blaze b,
-                                          tsk,
+                                          env,
                                           blaze c,
+                                          run,
+                                          blaze d,
                                           dat,
-                                          blaze d ]
+                                          blaze e ]
  where
   flags                      =  mconcat ["rm0=",tf rm0," ; ","rm1=",tf rm1,"\n"]
   blaze                      =  Blaze.fromByteString
-  (a, b, c, d)               =  template
   tf True                    =  "true"
   tf False                   =  "false"
-
-template :: (ByteString, ByteString, ByteString, ByteString)
-template                     =  (a, b, c, d)
- where
-  a : b : c : d : [] = findChunks $(embedFile "./model-scripts/tmpx.sh")
+  a : b : c : d : e : [] = findChunks $(embedFile "./model-scripts/tmpx.sh")
 
 findChunks                  ::  ByteString -> [ByteString]
 findChunks                   =  coalesce . markHoles
