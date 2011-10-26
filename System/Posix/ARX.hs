@@ -4,6 +4,7 @@
 
 module System.Posix.ARX where
 
+import Control.Applicative
 import Control.Monad
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as Bytes
@@ -12,11 +13,12 @@ import Data.Monoid
 import Data.Word
 
 import qualified Blaze.ByteString.Builder as Blaze
-import qualified Text.ShellEscape as Sh (sh, Sh, Escape(bytes))
+import qualified Codec.Compression.BZip as BZip
 
 import System.Posix.ARX.BlazeIsString -- Most string literals are builders.
 import System.Posix.ARX.HEREDat
 import qualified System.Posix.ARX.Sh as Sh
+import qualified System.Posix.ARX.TMPXTools as TMPXTools
 
 
 {-| ARX subprograms process some input to produce a script.
@@ -45,39 +47,29 @@ instance ARX SHDAT where
 
 {-| A 'TMPX' program archive streams to produce a script that unpacks the file
     data in a temporary location and runs the command with the attached
-    environment information. A 'TMPX' constructor provides an @execve@ like
-    interface, allowing one to specify an argument vector and environment
-    bindings that will be interpreted as literal values (not interpreted by
-    the shell).
+    environment information in that location. The command may be any
+    executable file contents, modulo architectural compatibility. It is
+    written along side the temporary work location, to ensure it does not
+    collide with any files in the archive.
  -}
-data TMPX                    =  TMPX SHDAT [Sh.Val] [(Sh.Var, Sh.Val)]
+data TMPX = TMPX SHDAT ByteString -- ^ Code of task to run.
+                       [(Sh.Var, Sh.Val)] -- ^ Environment mapping.
+                       Bool -- ^ Destroy tmp if task runs successfully.
+                       Bool -- ^ Destroy tmp if task exits with an error code.
 instance ARX TMPX where
   type Input TMPX            =  [(Tar, LazyB.ByteString)]
-  interpret (TMPX encoder cmd env) stuff = TMPXTools.toBuilder
-    TMPXTools.Template rm0 rm1 () ()
-    [ "d=/tmp/tmpx.`date -u +%FT%TZ`.$$\n",
-      "trap \"rm -rf $d\" EXIT\n",
-      "rm -rf $d\n",
-      "mkdir $d\n",
-      "cd $d\n",
-      mconcat (archives stuff),
-      "[ $# != 0 ] || set -- " `mappend` Sh.render cmd `mappend` "\n",
-      "( # User may trap/set whatever they like...\n",
-      Sh.render env,
-      "\"$@\"\n",
-      ") # ...in their own shell.\n",
-      "exit $?\n" ]
+  interpret (TMPX encoder run env rm0 rm1) stuff = TMPXTools.render
+    (TMPXTools.Template rm0 rm1 env' run' archives)
    where
-    archives stuff           =  case stuff of
-      [            ]        ->  []
-      (tar, bytes):t        ->  archive tar bytes : archives t
-     where
-      archive tar bytes      =  mconcat
-        ["{\n", interpret encoder bytes, "} | tar ", flags tar, "\n"]
-      flags TAR              =  "-x"
-      flags TGZ              =  "-x -z"
-      flags TBZ              =  "-x -j"
-
+    archives                 =  mconcat (uncurry archive <$> stuff)
+    archive tar bytes        =  mconcat
+      ["{\n", shdat bytes, "} | tar ", flags tar, "\n"]
+    flags TAR                =  "-x"
+    flags TGZ                =  "-x -z"
+    flags TBZ                =  "-x -j"
+    run' = (shdat . BZip.compress . LazyB.fromChunks . (:[])) run
+    env' = (shdat . BZip.compress . Blaze.toLazyByteString . Sh.render) env
+    shdat                    =  interpret encoder
 
 {-| Handled styles of Tar archive.
  -}

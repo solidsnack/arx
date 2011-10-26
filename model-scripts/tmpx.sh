@@ -19,17 +19,17 @@ then
   mkdir $dir
   cd $dir
 fi
-unpack_env () {
- : # To be set by tool.
-} ; unpack_env > ./env
-unpack_run () {
- : # To be set by tool.
-} ; unpack_run > ./run ; chmod ug+x ./run
+unpack_env () { : # NOOP
+  # To be set by tool.
+} ; unpack_env | bzcat > ./env
+unpack_run () { : # NOOP
+  # To be set by tool.
+} ; unpack_run | bzcat > ./run ; chmod ug+x ./run
 mkdir dat
 cd dat
-unpack_data () {
- : # To be set by tool.
-} ; unpack_data
+unpack_dat () { : # NOOP
+  # To be set by tool.
+} ; unpack_dat
 if $run
 then
   ( . ../env && ../run ) || true
