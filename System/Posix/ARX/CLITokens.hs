@@ -19,7 +19,7 @@ import Data.Attoparsec.FastSet
 {-| Non-overlapping classes of command line argument strings.
  -}
 data Class = EnvBinding    -- ^ An 'EnvBinding' has the form
-                           --   @<shell var name>=<C string>@. For example,
+                           --   @<shell var name>=<string>@. For example,
                            --   @SENDIN=the_clowns@.
            | QualifiedPath -- ^ A 'QualifiedPath' is a file path starting with
                            --   @/@, @./@, or @../@.
