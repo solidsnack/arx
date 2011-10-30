@@ -11,6 +11,7 @@ import Prelude hiding (takeWhile)
 import Control.Applicative hiding (many)
 import Data.ByteString (ByteString)
 import Data.ByteString.Char8 ()
+import Data.Either
 
 import Data.Attoparsec.Char8
 import Data.Attoparsec.FastSet
@@ -50,6 +51,13 @@ deriving instance Ord Class
 deriving instance Show Class
 
 
+match                       ::  Class -> ByteString -> Bool
+match                        =  (e2b .) . parseOnly . recognizer
+ where
+  e2b (Left _)               =  False
+  e2b (Right _)              =  True
+
+
 recognize                   ::  ByteString -> Maybe Class
 recognize                    =  e2m . parseOnly (choice recognizers)
  where
@@ -73,32 +81,22 @@ recognize                    =  e2m . parseOnly (choice recognizers)
     is recognized.
  -}
 recognizer                  ::  Class -> Parser ()
-recognizer EnvBinding        =  do satisfy varFirst
-                                   takeWhile varBody
-                                   char8 '='
-                                   return ()
-recognizer QualifiedPath     =  do string "/" <|> string "./" <|> string "../"
-                                   return ()
-recognizer DashDash          =  do string "--"
-                                   endOfInput
-recognizer LongOption        =  do string "--"
-                                   satisfy (/= '-')
-                                   return ()
-recognizer Dash              =  do char8 '-'
-                                   endOfInput
-recognizer ShortOption       =  do char8 '-'
-                                   satisfy (/= '-')
-                                   return ()
-recognizer URL               =  do takeWhile1 isURLSchemeChar
-                                   many $ do char8 '+' <|> char8 '/'
-                                             takeWhile1 isURLSchemeChar
-                                   string "://"
-                                   return ()
-recognizer HexNum            =  do string "0x"
-                                   takeWhile1 isHexDigit
-                                   endOfInput
-recognizer DecimalNum        =  do takeWhile1 isDigit
-                                   endOfInput
+recognizer EnvBinding        =  () <$ do satisfy varFirst
+                                         takeWhile varBody
+                                         char8 '='
+recognizer QualifiedPath     =  () <$ do string "/" <|> string "./"
+                                                    <|> string "../"
+recognizer DashDash          =  string "--" *> endOfInput
+recognizer LongOption        =  () <$ (string "--" >> satisfy (/= '-'))
+recognizer Dash              =  char8 '-' *> endOfInput
+recognizer ShortOption       =  () <$ (char8 '-' >> satisfy (/= '-'))
+recognizer URL               =  () <$ do takeWhile1 isURLSchemeChar
+                                         many $ do char8 '+' <|> char8 '/'
+                                                   takeWhile1 isURLSchemeChar
+                                         string "://"
+recognizer HexNum            =  string "0x" >> takeWhile1 isHexDigit
+                                            *> endOfInput
+recognizer DecimalNum        =  takeWhile1 isDigit *> endOfInput
 
 schemeSeparator              =  char8 '+' <|> char8 '/'
 
