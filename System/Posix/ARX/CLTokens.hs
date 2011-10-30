@@ -74,6 +74,7 @@ recognize                    =  e2m . parseOnly (choice recognizers)
                                                   HexNum,
                                                   DecimalNum ]
 
+
 {-| The recognizer appropriate to each token class. Parses successfully if a
     the token class is recognized, returning '()'. Most token types are
     defined in terms of a prefix of the input -- for example, 'QualifiedPath'
@@ -81,22 +82,23 @@ recognize                    =  e2m . parseOnly (choice recognizers)
     is recognized.
  -}
 recognizer                  ::  Class -> Parser ()
-recognizer EnvBinding        =  () <$ do satisfy varFirst
+recognizer cls               =  case cls of
+  EnvBinding                ->  () <$ do satisfy varFirst
                                          takeWhile varBody
                                          char8 '='
-recognizer QualifiedPath     =  () <$ do string "/" <|> string "./"
+  QualifiedPath             ->  () <$ do string "/" <|> string "./"
                                                     <|> string "../"
-recognizer DashDash          =  string "--" *> endOfInput
-recognizer LongOption        =  () <$ (string "--" >> satisfy (/= '-'))
-recognizer Dash              =  char8 '-' *> endOfInput
-recognizer ShortOption       =  () <$ (char8 '-' >> satisfy (/= '-'))
-recognizer URL               =  () <$ do takeWhile1 isURLSchemeChar
+  DashDash                  ->  string "--" *> endOfInput
+  LongOption                ->  () <$ (string "--" >> satisfy (/= '-'))
+  Dash                      ->  char8 '-' *> endOfInput
+  ShortOption               ->  () <$ (char8 '-' >> satisfy (/= '-'))
+  URL                       ->  () <$ do takeWhile1 isURLSchemeChar
                                          many $ do char8 '+' <|> char8 '/'
                                                    takeWhile1 isURLSchemeChar
                                          string "://"
-recognizer HexNum            =  string "0x" >> takeWhile1 isHexDigit
+  HexNum                    ->  string "0x" >> takeWhile1 isHexDigit
                                             *> endOfInput
-recognizer DecimalNum        =  takeWhile1 isDigit *> endOfInput
+  DecimalNum                ->  takeWhile1 isDigit *> endOfInput
 
 schemeSeparator              =  char8 '+' <|> char8 '/'
 
