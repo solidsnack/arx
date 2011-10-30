@@ -12,6 +12,8 @@ import Control.Applicative hiding (many)
 import Data.ByteString (ByteString)
 import Data.ByteString.Char8 ()
 import Data.Either
+import Data.Map (Map)
+import qualified Data.Map as Map
 
 import Data.Attoparsec.Char8
 import Data.Attoparsec.FastSet
@@ -46,11 +48,18 @@ data Class = EnvBinding    -- ^ An 'EnvBinding' has the form
                            --   @0x@; for example: @0x01a3@.
            | DecimalNum    -- ^ A 'DecimalNum' is a string of decimal digits:
                            --   @123123@.
+           | Size          -- ^ A 'Size' is a decimal number followed by a
+                           --   multiplicative suffix, in the manner of @dd@
+                           --   or @head@. Note that counts in terms of bytes
+                           --   require @B@ (unlike @dd@ or @head@). For a
+                           --   full list of suffixes, see 'sizes' below.
 deriving instance Eq Class
 deriving instance Ord Class
 deriving instance Show Class
 
 
+{-| Determine if a particular 'ByteString' matches the given 'Class' of token.
+ -}
 match                       ::  Class -> ByteString -> Bool
 match                        =  (e2b .) . parseOnly . recognizer
  where
@@ -58,6 +67,8 @@ match                        =  (e2b .) . parseOnly . recognizer
   e2b (Right _)              =  True
 
 
+{-| Determine if a particular 'ByteString' matches any 'Class' of token.
+ -}
 recognize                   ::  ByteString -> Maybe Class
 recognize                    =  e2m . parseOnly (choice recognizers)
  where
@@ -73,6 +84,22 @@ recognize                    =  e2m . parseOnly (choice recognizers)
                                                   URL,
                                                   HexNum,
                                                   DecimalNum ]
+
+
+{-| A ByteString stand-in that demoes each token class.
+ -}
+exemplar                    ::  Class -> ByteString
+exemplar cls                 =  case cls of
+  EnvBinding                ->  "VAR=value"
+  QualifiedPath             ->  "./qualified/path"
+  DashDash                  ->  "--"
+  LongOption                ->  "--long-option"
+  Dash                      ->  "-"
+  ShortOption               ->  "-shortopt"
+  URL                       ->  "scheme://url-to-resource"
+  HexNum                    ->  "0xA12FE"
+  DecimalNum                ->  "0123456789"
+  Size                      ->  "4MiB"
 
 
 {-| The recognizer appropriate to each token class. Parses successfully if a
@@ -99,6 +126,7 @@ recognizer cls               =  case cls of
   HexNum                    ->  string "0x" >> takeWhile1 isHexDigit
                                             *> endOfInput
   DecimalNum                ->  takeWhile1 isDigit *> endOfInput
+  Size                      ->  () <$ size
 
 schemeSeparator              =  char8 '+' <|> char8 '/'
 
@@ -115,4 +143,40 @@ isSchemeChar                 =  inClass "a-z0-9"
 isHexDigit                   =  inClass "0-9a-fA-F"
 
 isURLSchemeChar              =  inClass "a-z0-9"
+
+
+{-| A map from suffixes to sizes, following the conventions of command line
+    tools (GNU @dd@ or @head@ and many others) as well as the standard for
+    binary sizes established by the IEC.
+@
+  B       =    1
+  K = KiB = 1024B   kB = 1000B
+  M = MiB = 1024K   MB = 1000kB
+  G = GiB = 1024M   GB = 1000MB
+  T = TiB = 1024G   TB = 1000GB
+  P = PiB = 1024T   PB = 1000TB
+  E = EiB = 1024P   EB = 1000PB
+  Z = ZiB = 1024E   ZB = 1000EB
+  Y = YiB = 1024Z   YB = 1000ZB
+@
+ -}
+sizes                       ::  Map ByteString Integer
+sizes                        =  Map.fromList
+                                 [ ("B", 1),
+                                   ("K", 2^10), ("KiB", 2^10), ("kB", 10^03),
+                                   ("M", 2^20), ("MiB", 2^20), ("MB", 10^06),
+                                   ("G", 2^30), ("GiB", 2^30), ("GB", 10^09),
+                                   ("T", 2^40), ("TiB", 2^40), ("TB", 10^12),
+                                   ("P", 2^50), ("PiB", 2^50), ("PB", 10^15),
+                                   ("E", 2^60), ("EiB", 2^60), ("EB", 10^18),
+                                   ("Z", 2^70), ("ZiB", 2^70), ("ZB", 10^21),
+                                   ("Y", 2^80), ("YiB", 2^80), ("YB", 10^24) ]
+
+{-| Parse a size, consuming the entire input string.
+ -}
+size                        ::  Parser Integer
+size                         =  (*) <$> decimal <*> suffix
+ where
+  asSuffix (k, v)            =  v <$ try (string k <* endOfInput)
+  suffix                     =  choice (asSuffix <$> Map.toList sizes)
 
