@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings
-           , StandaloneDeriving #-}
+           , ScopedTypeVariables
+           , StandaloneDeriving  #-}
 {-| The CLTokens module describes non-overlapping classes of strings that are
     useful for disambiguating arguments to command line programs. Many common
     string formats -- environment variable assignments, URLs, option strings --
@@ -179,4 +180,10 @@ size                         =  (*) <$> decimal <*> suffix
  where
   asSuffix (k, v)            =  v <$ try (string k <* endOfInput)
   suffix                     =  choice (asSuffix <$> Map.toList sizes)
+
+{-| Parse a size, consuming the entire input string, with the final result
+    bounded by the maximum of a 'Bounded' type.
+ -}
+sizeBounded :: forall b . (Bounded b, Integral b) => Parser b
+sizeBounded = fromInteger . min (toInteger (maxBound :: b)) <$> size
 
