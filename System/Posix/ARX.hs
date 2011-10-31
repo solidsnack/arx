@@ -19,6 +19,7 @@ import System.Posix.ARX.BlazeIsString -- Most string literals are builders.
 import System.Posix.ARX.HEREDat
 import qualified System.Posix.ARX.Sh as Sh
 import qualified System.Posix.ARX.TMPXTools as TMPXTools
+import System.Posix.ARX.Tar
 
 
 {-| ARX subprograms process some input to produce a script.
@@ -70,11 +71,4 @@ instance ARX TMPX where
     run' = (shdat . BZip.compress . LazyB.fromChunks . (:[])) run
     env' = (shdat . BZip.compress . Blaze.toLazyByteString . Sh.render) env
     shdat                    =  interpret encoder
-
-{-| Handled styles of Tar archive.
- -}
-data Tar                     =  TAR | TGZ | TBZ
-deriving instance Eq Tar
-deriving instance Ord Tar
-deriving instance Show Tar
 
