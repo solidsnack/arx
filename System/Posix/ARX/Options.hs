@@ -55,9 +55,6 @@ rm                          ::  ArgsParser (Bool, Bool)
 rm  =   (True,  False) <$ arg "-rm0"  <|>  (False, True) <$ arg "-rm1"
    <|>  (False, False) <$ arg "-rm!"  <|>  (True,  True) <$ arg "-rm_"
 
-run                         ::  ArgsParser IOStream
-run                          =  arg "-run" >> ioStream
-
 env                         ::  ArgsParser (Sh.Var, Sh.Val)
 env                          =  do
   (var, assignment)         <-  Char8.break (== '=') <$> tokCL EnvBinding
@@ -65,17 +62,29 @@ env                          =  do
     Nothing                 ->  mzero
     Just x                  ->  return x
 
-cmd                         ::  ArgsParser [ByteString]
-cmd bars = arg bars >> manyTill anyArg (eof <|> () <$ arg bars)
+run                         ::  ArgsParser ByteSource
+run                          =  arg "-run" >> IOStream <$> ioStream
+
+cmd                         ::  ByteString -> ArgsParser ByteSource
+cmd bars = ByteString . Char8.unwords <$> bracketed bars bars anyArg
+ where
+  bracketed start end p      =  arg start >> manyTill p (eof <|> () <$ arg end)
 
 
 {-| A byte-oriented store that can be read from or written to in a streaming
     fashion.
  -}
-data IOStream                =  STDIO | Path ByteString
+data IOStream                =  STDIO | Path !ByteString
 deriving instance Eq IOStream
 deriving instance Ord IOStream
 deriving instance Show IOStream
+
+{-| A source of bytes (no writing, only reading).
+ -}
+data ByteSource              =  ByteString !ByteString | IOStream !IOStream
+deriving instance Eq ByteSource
+deriving instance Ord ByteSource
+deriving instance Show ByteSource
 
 
 type ArgsParser              =  Parsec [ByteString] ()
