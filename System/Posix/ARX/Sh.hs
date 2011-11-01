@@ -39,7 +39,7 @@ deriving instance Eq Var
 deriving instance Ord Var
 deriving instance Show Var
 instance Render Var where
-  render (Var bytes) = (Blaze.fromByteString . Esc.bytes . Esc.sh) bytes
+  render (Var bytes) = Blaze.fromByteString bytes
 
 var                         ::  ByteString -> Maybe Var
 var ""                       =  Nothing
