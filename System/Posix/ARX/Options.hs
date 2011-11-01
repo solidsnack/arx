@@ -4,11 +4,12 @@
 
 module System.Posix.ARX.Options where
 
-import Control.Applicative
+import Control.Applicative hiding (many)
 import Control.Monad
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as Bytes
 import qualified Data.ByteString.Char8 as Char8
+import Data.Either
 import Data.List
 import Data.Word
 import Text.Parsec hiding (satisfy, (<|>))
@@ -114,4 +115,6 @@ infixl 4 <@>
 
 tokCL                       ::  Class -> ArgsParser ByteString
 tokCL tokenClass             =  satisfy (CLTokens.match tokenClass)
+
+interleaveMany a b = partitionEithers <$> many (Left <$> a <|> Right <$> b)
 
