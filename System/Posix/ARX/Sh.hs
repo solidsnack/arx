@@ -19,7 +19,7 @@ import System.Posix.ARX.BlazeIsString
 setEU                       ::  Blaze.Builder
 setEU                        =  "set -e -u\n"
 
-{-| Valid shell string values contain any byte but null. 
+{-| Valid shell string values contain any byte but null.
  -}
 newtype Val                  =  Val ByteString
 deriving instance Eq Val
@@ -32,7 +32,7 @@ val                         ::  ByteString -> Maybe Val
 val bytes = guard (Bytes.all (/= '\0') bytes) >> Just (Val bytes)
 
 {-| Valid shell variable names consist of a leading letter or underscore and
-    then any number of letters, underscores or digits. 
+    then any number of letters, underscores or digits.
  -}
 newtype Var                  =  Var ByteString
 deriving instance Eq Var
