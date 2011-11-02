@@ -30,7 +30,7 @@ class ARX program where
 
 
 {-| An 'SHDAT' program processes byte streams with the specified chunking to
-    produce a script. 
+    produce a script.
  -}
 newtype SHDAT                =  SHDAT Word  -- ^ Chunk size.
 instance ARX SHDAT where
