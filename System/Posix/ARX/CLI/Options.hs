@@ -39,12 +39,14 @@ shdat                        =  do
     f (_, _, Just c) (as, bs, cs) = (as, bs, c:cs)
     f _ stuff                =  stuff
 
+tmpx :: ArgsParser ( [Word], [IOStream], [IOStream], [(Tar, IOStream)],
+                     [(Sh.Var, Sh.Val)], [(Bool, Bool)], [ByteSource]  )
 tmpx                         =  do
   arg "tmpx"
   bars                      <-  (try . lookAhead) slashes
   coalesce <$> case bars of
-    Nothing                 ->  flags eof
-    Just bars               ->  do let eof_bars = () <$ arg bars <|> eof
+                 Nothing    ->  flags eof
+                 Just bars  ->  do let eof_bars = () <$ arg bars <|> eof
                                    before <- flags eof_bars
                                    cmd <- _7 (gather eof_bars)
                                    after <- flags eof
