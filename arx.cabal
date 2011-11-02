@@ -38,9 +38,11 @@ library
                               , vector >= 0.9
                               , vector-algorithms >= 0.5.3
   exposed-modules             : System.Posix.ARX
+                                System.Posix.ARX.CLI
                                 System.Posix.ARX.CLI.CLTokens
-                                System.Posix.ARX.HEREDat
                                 System.Posix.ARX.CLI.Options
+                                System.Posix.ARX.HEREDat
+                                System.Posix.ARX.Programs
                                 System.Posix.ARX.Sh
                                 System.Posix.ARX.Tar
                                 System.Posix.ARX.TMPXTools

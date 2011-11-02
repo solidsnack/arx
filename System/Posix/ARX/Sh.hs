@@ -3,7 +3,8 @@
            , StandaloneDeriving #-}
 {-| Utilities for working with shell script.
  -}
-module System.Posix.ARX.Sh where
+module System.Posix.ARX.Sh ( Val(), val, Var(), var,
+                             setEU, Render(..), Raw(..) ) where
 
 import Control.Monad
 import Data.ByteString (ByteString)
@@ -27,6 +28,8 @@ deriving instance Ord Val
 deriving instance Show Val
 instance Render Val where
   render (Val bytes) = (Blaze.fromByteString . Esc.bytes . Esc.sh) bytes
+instance Raw Val where
+  raw (Val bytes)            =  bytes
 
 val                         ::  ByteString -> Maybe Val
 val bytes = guard (Bytes.all (/= '\0') bytes) >> Just (Val bytes)
@@ -39,7 +42,9 @@ deriving instance Eq Var
 deriving instance Ord Var
 deriving instance Show Var
 instance Render Var where
-  render (Var bytes) = Blaze.fromByteString bytes
+  render (Var bytes)         =  Blaze.fromByteString bytes
+instance Raw Var where
+  raw (Var bytes)            =  bytes
 
 var                         ::  ByteString -> Maybe Var
 var ""                       =  Nothing
@@ -60,4 +65,7 @@ instance Render [Val] where
 
 class Render t where
   render                    ::  t -> Blaze.Builder
+
+class Raw t where
+  raw                       ::  t -> ByteString
 
