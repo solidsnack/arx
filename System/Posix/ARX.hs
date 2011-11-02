@@ -46,8 +46,8 @@ instance ARX SHDAT where
       chunkIt                =  script . chunk . mconcat . LazyB.toChunks
 
 
-{-| A 'TMPX' program archive streams to produce a script that unpacks the file
-    data in a temporary location and runs the command with the attached
+{-| A 'TMPX' program archives streams to produce a script that unpacks the
+    file data in a temporary location and runs the command with the attached
     environment information in that location. The command may be any
     executable file contents, modulo architectural compatibility. It is
     written along side the temporary work location, to ensure it does not
