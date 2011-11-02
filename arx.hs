@@ -3,6 +3,7 @@
 
 import qualified Data.ByteString.Lazy as LazyB
 import qualified Data.ByteString as StrictB
+import qualified Data.ByteString.Char8 as Char8
 import Data.Monoid
 import System.Environment
 import System.Exit

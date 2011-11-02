@@ -6,7 +6,7 @@
     string formats -- environment variable assignments, URLs, option strings --
     are recognized by this module's utilities.
  -}
-module System.Posix.ARX.CLTokens where
+module System.Posix.ARX.CLI.CLTokens where
 
 import Prelude hiding (takeWhile)
 import Control.Applicative hiding (many)

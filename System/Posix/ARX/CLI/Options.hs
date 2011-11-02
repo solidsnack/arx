@@ -2,7 +2,7 @@
            , TupleSections
            , StandaloneDeriving #-}
 
-module System.Posix.ARX.Options where
+module System.Posix.ARX.CLI.Options where
 
 import Control.Applicative hiding (many)
 import Control.Monad
@@ -18,8 +18,8 @@ import Text.Parsec hiding (satisfy, (<|>))
 
 import qualified Data.Attoparsec
 
-import System.Posix.ARX.CLTokens (Class(..))
-import qualified System.Posix.ARX.CLTokens as CLTokens
+import System.Posix.ARX.CLI.CLTokens (Class(..))
+import qualified System.Posix.ARX.CLI.CLTokens as CLTokens
 import qualified System.Posix.ARX.Sh as Sh
 import System.Posix.ARX.Tar
 
