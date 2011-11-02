@@ -2,7 +2,7 @@
            , TypeFamilies
            , StandaloneDeriving #-}
 
-module System.Posix.ARX where
+module System.Posix.ARX.Programs where
 
 import Control.Applicative
 import Control.Monad
