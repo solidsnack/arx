@@ -40,6 +40,7 @@ shdat                        =  do
     f _ stuff                =  stuff
 
 tmpx                         =  do
+  arg "tmpx"
   bars                      <-  (try . lookAhead) slashes
   coalesce <$> case bars of
     Nothing                 ->  flags eof
