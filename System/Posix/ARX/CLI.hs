@@ -24,5 +24,18 @@ import qualified System.Posix.ARX.Sh as Sh
 import System.Posix.ARX.Tar
 
 
---parseArgs args = do
+arx                          =  do
+  parsed                    <-  Left <$> shdat <|> Right <$> tmpx
+  case parsed of
+    Left shdatStuff         ->  undefined
+    Right tmpxStuff         ->  undefined
+
+shdatResolve                ::  ([Word], [IOStream], [IOStream])
+                            ->  (SHDAT, IOStream, [IOStream])
+shdatResolve                 =  undefined
+
+tmpxResolve :: ( [Word], [IOStream], [IOStream], [(Tar, IOStream)],
+                 [(Sh.Var, Sh.Val)], [(Bool, Bool)], [ByteSource]  )
+            -> (TMPX, IOStream, [IOStream], [(Tar, IOStream)])
+tmpxResolve                  =  undefined
 
