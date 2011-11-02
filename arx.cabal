@@ -27,17 +27,23 @@ library
   build-depends               : base >= 2 && <= 5
                               , bytestring >= 0.9
                               , containers
+                              , attoparsec >= 0.9.1.2
                               , blaze-builder >= 0.3
                               , bytestring-nums >= 0.3.3
                               , bzlib >= 0.5
                               , file-embed >= 0.0.4.1
+                              , parsec >= 3.1.2
                               , shell-escape >= 0.1.1
                               , template-haskell
                               , vector >= 0.9
                               , vector-algorithms >= 0.5.3
   exposed-modules             : System.Posix.ARX
+                                System.Posix.ARX.CLTokens
                                 System.Posix.ARX.HEREDat
+                                System.Posix.ARX.Options
                                 System.Posix.ARX.Sh
+                                System.Posix.ARX.Tar
+                                System.Posix.ARX.TMPXTools
   extensions                  : FlexibleInstances
                                 OverloadedStrings
                                 StandaloneDeriving
@@ -54,10 +60,12 @@ executable                      arx
   build-depends               : base >= 2 && <= 5
                               , bytestring >= 0.9
                               , containers
+                              , attoparsec >= 0.9.1.2
                               , blaze-builder >= 0.3
                               , bytestring-nums >= 0.3.3
                               , bzlib >= 0.5
                               , file-embed >= 0.0.4.1
+                              , parsec >= 3.1.2
                               , shell-escape >= 0.1.1
                               , template-haskell
                               , vector >= 0.9
