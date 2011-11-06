@@ -53,7 +53,7 @@ instance ARX SHDAT where
     written along side the temporary work location, to ensure it does not
     collide with any files in the archive.
  -}
-data TMPX = TMPX SHDAT ByteString -- ^ Code of task to run.
+data TMPX = TMPX SHDAT LazyB.ByteString -- ^ Code of task to run.
                        [(Sh.Var, Sh.Val)] -- ^ Environment mapping.
                        Bool -- ^ Destroy tmp if task runs successfully.
                        Bool -- ^ Destroy tmp if task exits with an error code.
