@@ -21,7 +21,6 @@ import qualified Data.Attoparsec
 import System.Posix.ARX.CLI.CLTokens (Class(..))
 import qualified System.Posix.ARX.CLI.CLTokens as CLTokens
 import qualified System.Posix.ARX.Sh as Sh
-import System.Posix.ARX.Tar
 
 
 shdat                       ::  ArgsParser ([Word], [IOStream], [IOStream])
@@ -39,7 +38,7 @@ shdat                        =  do
     f (_, _, Just c) (as, bs, cs) = (as, bs, c:cs)
     f _ stuff                =  stuff
 
-tmpx :: ArgsParser ( [Word], [IOStream], [IOStream], [(Tar, IOStream)],
+tmpx :: ArgsParser ( [Word], [IOStream], [ByteString], [IOStream],
                      [(Sh.Var, Sh.Val)], [(Bool, Bool)], [ByteSource]  )
 tmpx                         =  do
   arg "tmpx"
@@ -54,8 +53,9 @@ tmpx                         =  do
  where
   flags                      =  manyTill flag
   gather = (ByteString . Char8.unwords <$>) . manyTill anyArg
-  flag                       =  _1 blockSize <|> _2 outputFile <|> _3 ioStream
-                            <|> _4 tar <|> _5 env <|> _6 rm <|> _7 scriptToRun
+  flag                       =  _1 blockSize <|> _2 outputFile <|> _3 qPath
+                            <|> _4 archive   <|> _5 env        <|> _6 rm
+                            <|> _7 scriptToRun
   _1 = ((,Nothing,Nothing,Nothing,Nothing,Nothing,Nothing) . Just <$>)
   _2 = ((Nothing,,Nothing,Nothing,Nothing,Nothing,Nothing) . Just <$>)
   _3 = ((Nothing,Nothing,,Nothing,Nothing,Nothing,Nothing) . Just <$>)
@@ -92,9 +92,11 @@ ioStream                    ::  ArgsParser IOStream
 ioStream                     =  STDIO <$  tokCL Dash
                             <|> Path  <$> tokCL QualifiedPath
 
-tar                         ::  ArgsParser (Tar, IOStream)
-tar = (,) <$> (TAR <$ arg "-tar" <|> TBZ <$ arg "-tbz" <|> TGZ <$ arg "-tgz")
-          <*> ioStream
+qPath                       ::  ArgsParser ByteString
+qPath                        =  tokCL QualifiedPath
+
+archive                     ::  ArgsParser IOStream
+archive                      =  arg "-ar" *> ioStream
 
 rm                          ::  ArgsParser (Bool, Bool)
 rm  =   (True,  False) <$ arg "-rm0"  <|>  (False, True) <$ arg "-rm1"
