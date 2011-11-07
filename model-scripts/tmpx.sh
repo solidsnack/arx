@@ -19,21 +19,26 @@ then
   mkdir $dir
   cd $dir
 fi
+go () {
+  unpack_env | bzcat > ./env
+  unpack_run | bzcat > ./run ; chmod ug+x ./run
+  mkdir dat
+  cd dat
+  unpack_dat
+  if $run
+  then
+    ( . ../env && ../run ) && ext=$? || ext=$?
+    [ 0 = $ext ] && rm_=$rm0 || rm_=$rm1
+    exit $ext
+  fi
+}
 unpack_env () { : # NOOP
   # To be set by tool.
-} ; unpack_env | bzcat > ./env
+}
 unpack_run () { : # NOOP
   # To be set by tool.
-} ; unpack_run | bzcat > ./run ; chmod ug+x ./run
-mkdir dat
-cd dat
+}
 unpack_dat () { : # NOOP
   # To be set by tool.
-} ; unpack_dat
-if $run
-then
-  ( . ../env && ../run ) || true
-  ext=$?
-  [ 0 = $ext ] && : ${rm_:=$rm0} || : ${rm_:=$rm1}
-  exit $ext
-fi
+}
+go
