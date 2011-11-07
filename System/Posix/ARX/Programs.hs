@@ -68,7 +68,7 @@ instance ARX TMPX where
     flags TAR                =  "-x"
     flags TGZ                =  "-x -z"
     flags TBZ                =  "-x -j"
-    run' = (shdat . BZip.compress . LazyB.fromChunks . (:[])) run
+    run'                     =  (shdat . BZip.compress) run
     env' = (shdat . BZip.compress . Blaze.toLazyByteString . Sh.render) env
     shdat                    =  interpret encoder
 
