@@ -79,7 +79,7 @@ shdatResolve (sizes, outs, ins) = (size, out, ins')
 shdatCheckStreams           ::  [IOStream] -> Maybe ByteString
 shdatCheckStreams ins        =  streamsMessage [ins']
  where
-  ins'                       =  case [ x == STDIO | x <- ins ] of
+  ins'                       =  case [ x | x <- ins, x == STDIO ] of
       []                    ->  Zero
       [_]                   ->  One "as a file input"
       _:_:_                 ->  Many ["more than once as a file input"]
@@ -105,7 +105,7 @@ tmpxResolve (sizes, outs, ins, tars, env, rms, cmds) =
 tmpxCheckStreams            ::  [IOStream] -> ByteSource -> Maybe ByteString
 tmpxCheckStreams tars cmd    =  streamsMessage [tars', cmd']
  where
-  tars'                      =  case [ x == STDIO | x <- tars ] of
+  tars'                      =  case [ x | x <- tars, x == STDIO ] of
       []                    ->  Zero
       [_]                   ->  One "as an archive input"
       _:_:_                 ->  Many ["more than once as an archive input"]
