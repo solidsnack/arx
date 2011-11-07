@@ -18,6 +18,7 @@ import Data.Ord
 import Data.Word
 import System.Environment
 import System.Exit
+import System.IO
 
 import qualified Blaze.ByteString.Builder as Blaze
 import Text.Parsec hiding (satisfy, (<|>))
@@ -33,31 +34,26 @@ import System.Posix.ARX.Tar
 main                         =  do
   args                      <-  (Char8.pack <$>) <$> getArgs
   case parse arx "<args>" args of
-    Left _                  ->  do
-      putStrLn "Argument error."
-      exitSuccess
+    Left _                  ->  die "Argument error."
     Right (Left shdatArgs)  ->  do
       let (size, out, ins)   =  shdatResolve shdatArgs
       case shdatCheckStreams ins of Nothing  -> return ()
-                                    Just err -> do Char8.putStrLn err
-                                                   exitFailure
+                                    Just msg -> do die msg
       let apply i            =  interpret (SHDAT size) <$> inIOStream i
       mapM_ ((send out =<<) . apply) ins
     Right (Right tmpxArgs)  ->  do
       let (size, out, ins, tars, env, (rm0, rm1), cmd) = tmpxResolve tmpxArgs
-      (ins /= []) `when` do Char8.putStrLn pUnsupported
+      (ins /= []) `when` do err pUnsupported
                             exitFailure
       case tmpxCheckStreams tars cmd of Nothing  -> return ()
-                                        Just err -> do Char8.putStrLn err
-                                                       exitFailure
+                                        Just msg -> do die msg
       cmd'                  <-  openByteSource cmd
       let tmpx               =  TMPX (SHDAT size) cmd' env rm0 rm1
       (badAr, goodAr)       <-  partitionEithers <$> mapM openArchive tars
-      (badAr /= []) `when` do (((Char8.putStrLn .) .) . blockMessage)
+      (badAr /= []) `when` do (((die .) .) . blockMessage)
                                 "The file magic of some archives:"
                                 badAr
                                 "could not be interpreted."
-                              exitFailure
       send out (interpret tmpx goodAr)
  where
   arx                        =  Left <$> shdat <|> Right <$> tmpx
@@ -176,4 +172,10 @@ streamsMessage filtered      =  case foldl' mappend Zero filtered of
 
 blockMessage a bs c          =  Char8.unlines
   [a, Bytes.intercalate ",\n" (mappend "  " <$> bs), c]
+
+err ""                       =  return ()
+err b | Char8.last b == '\n' =  Char8.hPutStr stderr b
+      | otherwise            =  Char8.hPutStr stderr (b `Char8.snoc` '\n')
+
+die msg                      =  err msg >> exitFailure
 
