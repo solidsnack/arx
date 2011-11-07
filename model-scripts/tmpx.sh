@@ -16,6 +16,7 @@ then
   rm -rf $dir
   : ${rm_:=true}
   ! $rm_ || trap "! \$rm_ || rm -rf $dir" EXIT
+  trap "exit 2" HUP INT QUIT BUS SEGV PIPE TERM
   mkdir $dir
   cd $dir
 fi
