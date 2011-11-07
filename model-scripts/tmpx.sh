@@ -27,8 +27,14 @@ go () {
   unpack_dat
   if $run
   then
-    ( . ../env && ../run ) && ext=$? || ext=$?
-    [ 0 = $ext ] && rm_=$rm0 || rm_=$rm1
+    if ( . ../env && ../run )
+    then
+      ext=$?
+      rm_=$rm0
+    else
+      ext=$?
+      rm_=$rm1
+    fi
     exit $ext
   fi
 }
