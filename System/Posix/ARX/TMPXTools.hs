@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell
+           , OverloadedStrings
            , RecordWildCards
            , PatternGuards   #-}
 
