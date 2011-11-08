@@ -100,7 +100,7 @@ expanded: about 1% for randomish data like compressed tarballs and about 10%
 in pathological cases.
 
 The `shdat` subcommand can be given any number of paths, which will be
-concatenated in the order given. If not path is given, or if ``-`` is given,
+concatenated in the order given. If no path is given, or if ``-`` is given,
 then STDIN will be read.
 
   ``-b <size>``
