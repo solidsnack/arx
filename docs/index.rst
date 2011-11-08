@@ -114,3 +114,13 @@ then STDIN will be read.
     By default, the generated script is sent to STDOUT. With ``-o``, output is
     redirected to the given path.
 
+Examples
+--------
+
+.. code-block:: bash
+
+  # Installer script that preserves failed builds.
+  git archive HEAD | bzip2 | arx tmpx -rm0 // make install > go.sh
+  # Now install as root; but don't log in as root.
+  cat ./go.sh | ssh joey@hostname sudo /bin/sh
+
