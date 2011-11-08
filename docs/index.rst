@@ -51,17 +51,6 @@ shdat
 The `shdat` subcommand translates binary data in to a shell script which
 outputs the binary data. The data is encoded in HERE documents in such a way
 that data without NULs is not changed and that data with NULs is minimally
-expanded (about 1% for randomish data like compressed tarballs).
-
-HERE docs, with the so-called 'quoted delimiter', turn out to be the fastest
-string type implemented in commonly availabe shells.
-
-Data without NULs need only be scanned to find a short delimiter string. For
-data with NULs, the NULs must be encoded and a shell command constructed that
-restores them. A low-frequency character is chosen to replace NUL and a second
-character is chosen to act as an escape character. All instances of the
-character used to replace nulls and the escape character are replaced with
-escape sequences. A pipeline with `tr` and `sed` is constructed that restores
-the NULs and translates the escape sequences back to the characters they
-replaced.
+expanded: about 1% for randomish data like compressed tarballs and about 10%
+in pathological cases.
 
