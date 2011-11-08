@@ -48,8 +48,14 @@ tmpx
 The `tmpx` subcommand bundles together archives, environment settings and an
 executable or shell command in to a Bourne-compatible script that runs the
 command or executable in a temporary directory, after having unpacked the
-archives and set the environment. After execution, the temporary directory is
-removed (or not, depending on the ``-rm[10!_]`` family of options).
+archives and set the environment.
+
+The temporary directory created by the script is different for each
+invocation, with a name of the form ``/tmp/tmpx.<timestamp>.<pid>``. The
+timestamp used is a UTC, ISO 8601 format timestamp. One happy consequence of
+this is that earlier jobs sort ASCIIbetically before later jobs. After
+execution, the temporary directory is removed (or not, depending on the
+``-rm[10!_]`` family of options).
 
   ``-ar <path>``
     An archive to include in the generated shell script. If no archives are
