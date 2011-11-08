@@ -130,3 +130,6 @@ Examples
   # Now install as root; but don't log in as root.
   cat ./go.sh | ssh joey@hostname sudo /bin/sh
 
+  # Bundle an instance of an application with DB credentials and launch.
+  arx tmpx -rm! -ar app.tbz -ar credentials.tgz // rake start | ssh ...
+
