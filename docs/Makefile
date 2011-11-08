@@ -128,3 +128,10 @@ doctest:
 	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) $(BUILDDIR)/doctest
 	@echo "Testing of doctests in the sources finished, look at the " \
 	      "results in $(BUILDDIR)/doctest/output.txt."
+
+# Added to extract docs for inclusion in source distribution.
+blessed: man text
+	mkdir -p ./blessed
+	cp $(BUILDDIR)/man/arx.1      ./blessed/arx.man
+	cp $(BUILDDIR)/text/index.txt ./blessed/arx.txt
+
