@@ -12,6 +12,9 @@ description                   : Archive execution tool.
 cabal-version                 : >= 1.6
 build-type                    : Simple
 extra-source-files            : README
+                              , LICENSE
+                              , docs/blessed/arx.man
+                              , docs/blessed/arx.txt
 
 source-repository               head
   type                        : git
@@ -33,8 +36,10 @@ library
                               , bzlib >= 0.5
                               , file-embed >= 0.0.4.1
                               , parsec >= 3.1.2
+                              , process >= 1.0
                               , shell-escape >= 0.1.1
                               , template-haskell
+                              , Unixutils >= 1.36
                               , vector >= 0.9
                               , vector-algorithms >= 0.5.3
   exposed-modules             : System.Posix.ARX
@@ -68,8 +73,10 @@ executable                      arx
                               , bzlib >= 0.5
                               , file-embed >= 0.0.4.1
                               , parsec >= 3.1.2
+                              , process >= 1.0
                               , shell-escape >= 0.1.1
                               , template-haskell
+                              , Unixutils >= 1.36
                               , vector >= 0.9
                               , vector-algorithms >= 0.5.3
   extensions                  : FlexibleInstances

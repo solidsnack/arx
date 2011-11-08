@@ -1,0 +1,191 @@
+.TH "ARX" "1" "2011-11-08" "0.0.0" "arx"
+.SH NAME
+arx \- archived execution
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.\" Man page generated from reStructeredText.
+.
+.SH SYNOPSIS
+.sp
+.nf
+.ft C
+arx ... (\-h|\-[?]|\-\-help)? ...
+arx shdat (\-b <size>)? (\-o <output file>)? < input
+arx shdat (\-b <size>)? (\-o <output file>)? <input file>+
+arx tmpx <options>* (//+ <shell command> (//+ <options>*)?)?
+.ft P
+.fi
+.SH DESCRIPTION
+.sp
+The \fIarx\fP tool automates a common task in the world of operations automation:
+packing code, sending it to a remote machine, unpacking in a temporary
+directory, running a task therein and then removing the temporary directory.
+One might do this when setting up a moderately complicated back\-up script,
+installing a new version of nginx or even just to run jobs across ones
+infrastructure.
+.sp
+The \fIarx\fP tool has no in\-built notion of remote connections or server
+clusters; all automation is captured as Bourne compatible scripts that use a
+small number of UNIX utilities in a broadly portable way. At present, the
+utilities used are \fIsed\fP, \fItr\fP, \fIhead\fP, \fItar\fP, \fIbzip2\fP and \fIgzip\fP. The
+generated scripts can be piped to \fIssh\fP to be executed remotely.
+.sp
+The \fItmpx\fP subcommand of \fIarx\fP offers a variety of options for bundling code
+and a task to run. The \fIshdat\fP subcommand exposes the lower\-level
+functionality of encoding binary data in a shell script that outputs that
+binary data, using HERE documents and some odd replacement rules for nulls.
+.sp
+For all subcommands, when options overlap in their effect \-\- for example,
+setting the output with \fB\-o\fP \-\- the rightmost option takes precedence.
+Whenever \fB\-h\fP, \fB\-?\fP or \fB\-\-help\fP is present on the command line, help is
+displayed and the program exits.
+.sp
+When paths are specified on an \fBarx\fP command line, they must be qualified,
+starting with \fB/\fP, \fB./\fP or \fB../\fP. This simplifies the command line
+syntax, overall, without introducing troublesome ambiguities.
+.SH TMPX
+.sp
+The \fItmpx\fP subcommand bundles together archives, environment settings and an
+executable or shell command in to a Bourne\-compatible script that runs the
+command or executable in a temporary directory, after having unpacked the
+archives and set the environment.
+.sp
+The temporary directory created by the script is different for each
+invocation, with a name of the form \fB/tmp/tmpx.<timestamp>.<pid>\fP. The
+timestamp used is a UTC, ISO 8601 format timestamp. One happy consequence of
+this is that earlier jobs sort ASCIIbetically before later jobs. After
+execution, the temporary directory is removed (or not, depending on the
+\fB\-rm[10!_]\fP family of options).
+.INDENT 0.0
+.INDENT 3.5
+.INDENT 0.0
+.TP
+.B \fB\-ar <path>\fP
+.sp
+An archive to include in the generated shell script. If no archives are
+specified, or \fB\-ar \-\fP is given, then STDIN will be included.
+.TP
+.B \fB\-rm0\fP, \fB\-rm1\fP, \fB\-rm_\fP, \fB\-rm!\fP
+.sp
+By default, the temporary directory created by the script will be deleted
+no matter the exit status status of the task. These options cause a script
+to be generated that deletes the temporary directory only on success, only
+on failure, always (the default) or never.
+.TP
+.B \fB\-b <size>\fP
+.sp
+Please see the documentation for this option, shared with \fIshdat\fP, below.
+.TP
+.B \fB\-o <path>\fP
+.sp
+By default, the generated script is sent to STDOUT. With \fB\-o\fP, output is
+redirected to the given path.
+.TP
+.B \fB\-e <path>\fP
+.sp
+Causes the file specified to be packaged as the task to be run. A binary
+executable, a Ruby script or a longish shell script all fit here.
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.sp
+In addition to these options, arguments of the form \fBVAR=VALUE\fP are
+recognized as environment mappings and stored away in the script, to be
+sourced on execution.
+.sp
+Without \fB\-e\fP, the \fItmpx\fP subcommand tries to find the task to be run as a
+sequence of arguments delimited by a run of slashes. The following forms are
+all recognized:
+.sp
+.nf
+.ft C
+arx tmpx  ...some args... // ...command...
+arx tmpx  ...some args... // ...command... // ...more args...
+arx tmpx // ...command... // ...some args...
+.ft P
+.fi
+.sp
+The slash runs must have the same number of slashes and must be the longest
+continuous runs of slashes on the command line. The command will be included
+as is in a Bourne shell script.
+.SH SHDAT
+.sp
+The \fIshdat\fP subcommand translates binary data in to a shell script which
+outputs the binary data. The data is encoded in HERE documents in such a way
+that data without NULs is not changed and that data with NULs is minimally
+expanded: about 1% for randomish data like compressed tarballs and about 10%
+in pathological cases.
+.sp
+The \fIshdat\fP subcommand can be given any number of paths, which will be
+concatenated in the order given. If no path is given, or if \fB\-\fP is given,
+then STDIN will be read.
+.INDENT 0.0
+.INDENT 3.5
+.INDENT 0.0
+.TP
+.B \fB\-b <size>\fP
+.sp
+The size of data chunks to place in each HERE document. The argument is a
+positive integer followed by suffixes like \fBB\fP, \fBK\fP, \fBKiB\fP, \fBM\fP
+and \fBMiB\fP, in the manner of \fBdd\fP, \fBhead\fP and many other tools. The
+default is 4MiB.  This is unlikely to make a difference for you unless the
+generated script is intended to be run on a memory\-constrained system.
+.TP
+.B \fB\-o <path>\fP
+.sp
+By default, the generated script is sent to STDOUT. With \fB\-o\fP, output is
+redirected to the given path.
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.SH EXAMPLES
+.sp
+.nf
+.ft C
+# Installer script that preserves failed builds.
+git archive HEAD | bzip2 | arx tmpx \-rm0 // make install > go.sh
+# Now install as root; but don\(aqt log in as root.
+cat ./go.sh | ssh joey@hostname sudo /bin/sh
+
+# Variation of the above.
+git archive HEAD | bzip2 | arx tmpx \-rm0 \-e ./build\-script.py
+
+# Bundle an instance of an application with DB credentials and run it.
+arx tmpx \-rm! \-ar ./app.tbz \-ar ./stage\-info.tgz // rake start | ssh ...
+
+# Get dump of linking info for build that works here but not there.
+arx tmpx \-ar ./server\-build.tgz LD_DEBUG=files // ./bin/start | ssh ...
+.ft P
+.fi
+.SH AUTHOR
+Jason Dusek
+.SH COPYRIGHT
+2011, Jason Dusek
+.\" Generated by docutils manpage writer.
+.\" 
+.
