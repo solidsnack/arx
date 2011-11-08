@@ -100,15 +100,15 @@ expanded: about 1% for randomish data like compressed tarballs and about 10%
 in pathological cases.
 
 The `shdat` subcommand can be given any number of paths, which will be
-concated in the order given. If not path is given, or if ``-`` is given, then
-STDIN will be read.
+concatenated in the order given. If not path is given, or if ``-`` is given,
+then STDIN will be read.
 
   ``-b <size>``
     The size of data chunks to place in each HERE document. The argument is a
-    positive integer followed by ``B``, ``K``, ``KiB``, ``M`` and ``MiB``, in
-    the manner of ``dd``, ``head`` and many other tools. The default is 4MiB.
-    This is unlikely to make a difference for you unless the generated script
-    is intended to be run on a memory-constrained system.
+    positive integer followed by suffixes like ``B``, ``K``, ``KiB``, ``M``
+    and ``MiB``, in the manner of ``dd``, ``head`` and many other tools. The
+    default is 4MiB.  This is unlikely to make a difference for you unless the
+    generated script is intended to be run on a memory-constrained system.
 
   ``-o <path>``
     By default, the generated script is sent to STDOUT. With ``-o``, output is
