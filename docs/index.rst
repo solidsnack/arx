@@ -43,7 +43,7 @@ The `tmpx` subcommand bundles together archives, environment settings and an
 executable or shell command in to a Bourne-compatible script that runs the
 command or executable in a temporary directory, after having unpacked the
 archives and set the environment. After execution, the temporary directory is
-removed (or not, depending on options described below).
+removed (or not, depending on the `-rm[10!_]` family of options).
 
 shdat
 =====
