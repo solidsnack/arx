@@ -130,6 +130,12 @@ Examples
   # Now install as root; but don't log in as root.
   cat ./go.sh | ssh joey@hostname sudo /bin/sh
 
+  # Variation of the above.
+  git archive HEAD | bzip2 | arx tmpx -rm0 -e ./build-script.py
+
   # Bundle an instance of an application with DB credentials and run it.
-  arx tmpx -rm! -ar app.tbz -ar staging-info.tgz // rake start | ssh ...
+  arx tmpx -rm! -ar ./app.tbz -ar ./staging-info.tgz // rake start | ssh ...
+
+  # Get dump of linking info for build that works here but not there.
+  arx tmpx -ar ./server-build.tgz LD_DEBUG=files // ./bin/start | ssh ...
 
