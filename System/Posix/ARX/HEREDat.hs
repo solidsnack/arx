@@ -196,7 +196,7 @@ safeForHereDoc              ::  ByteString -> Bool
 safeForHereDoc               =  not . Bytes.any (== 0x00)
 
 {-| Predicate to determine whether data is represented as an encoded chunk or
-    or is unencoded.
+    is unencoded.
  -}
 encoded                     ::  Chunk -> Bool
 encoded (SafeChunk _)        =  False
