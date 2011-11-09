@@ -31,6 +31,9 @@ import qualified System.Posix.ARX.Sh as Sh
 import System.Posix.ARX.Tar
 
 
+{-| Run CLI tool, processing arguments and options.
+ -}
+main                        ::  IO ()
 main                         =  do
   args                      <-  (Char8.pack <$>) <$> getArgs
   case parse arx "<args>" args of
