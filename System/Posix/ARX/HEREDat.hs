@@ -89,20 +89,20 @@ chunk block
     that nulls are mapped to the replace byte, replace bytes are mapped to a
     pair of escape bytes and the escape byte is is mapped to an escape byte
     followed by an underscore. For example, if the null replace byte is @!@
-    and the escape byte is @#@ then all nulls become @!@, any @!@ become @##@
-    and all @#@ become @#_@.
+    and the escape byte is @\#@ then all nulls become @!@, any @!@ become
+    @\#\#@ and all @\#@ become @\#_@.
 
     This escaping scheme is dictated by the needs of our Sed decoder, which is
     just two global substitions, one after another. If the escaping were such
-    that, with our characters above, @#@ escaped to @##@ and @!@ to @#_@, then
-    @#_@ in the input becomes @##_@. We want to run the subsitution for @#@
-    first, to catch this; it produces @#_@; then Sed feeds the input to the
-    second substitution which unfortunately renders @!@. In the alternate
-    scheme, the input is encoded @#__@, the @!@ decoder runs first and ignores
-    it, then the @#@ runs and catches it. When using a pipeline of stream
-    processors to interpret escape sequences, it seems best to ensure that
-    only the very last processor inserts escape characters, to prevent their
-    further interpretation.
+    that, with our characters above, @\#@ escaped to @\#\#@ and @!@ to @\#_@,
+    then @\#_@ in the input becomes @\#\#_@. We want to run the subsitution
+    for @\#@ first, to catch this; it produces @\#_@; then Sed feeds the input
+    to the second substitution which unfortunately renders @!@. In the
+    alternate scheme, the input is encoded @\#__@, the @!@ decoder runs first
+    and ignores it, then the @\#@ decoder runs and catches it. When using a
+    pipeline of stream processors to interpret escape sequences, it seems best
+    to ensure that only the very last processor inserts escape characters, to
+    prevent their further interpretation.
  -}
 encode                      ::  Word8 -> Word8 -> ByteString -> ByteString
 encode nullReplaceByte escapeByte = Bytes.concatMap rewrite
