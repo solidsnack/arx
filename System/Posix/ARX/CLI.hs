@@ -148,7 +148,7 @@ arIOStream io                =  do opened <- inIOStream io
 defaultBlock                ::  Word
 defaultBlock                 =  0x400000
 
-{-| The default task is a no-op call to @/bin/true@.
+{-| The default task is a no-op call to @\/bin\/true@.
  -}
 defaultTask                 ::  ByteSource
 defaultTask                  =  ByteString "/bin/true"
