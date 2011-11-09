@@ -135,4 +135,5 @@ blessed: man
 	cp $(BUILDDIR)/man/arx.1      ./blessed/arx.man
 	man ./blessed/arx.man | col -bx |\
 	sed -n '/SYNOPSIS/,/AUTHOR/ { /AUTHOR/d ; p ;}' > ./blessed/arx.txt
+	cp ./blessed/arx.txt ../README
 

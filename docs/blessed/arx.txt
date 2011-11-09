@@ -47,13 +47,11 @@ TMPX
        depending on the -rm[10!_] family of options).
 
           -ar <path>
-
                  An  archive  to  include in the generated shell script. If no
                  archives are specified, or -ar - is given, then STDIN will be
                  included.
 
           -rm0, -rm1, -rm_, -rm!
-
                  By  default,  the  temporary  directory created by the script
                  will be deleted no matter the exit status status of the task.
                  These options cause a script to be generated that deletes the
@@ -61,17 +59,14 @@ TMPX
                  (the default) or never.
 
           -b <size>
-
                  Please  see  the  documentation  for this option, shared with
                  shdat, below.
 
           -o <path>
-
                  By default, the generated script is sent to STDOUT. With  -o,
                  output is redirected to the given path.
 
           -e <path>
-
                  Causes  the  file  specified to be packaged as the task to be
                  run. A binary executable, a Ruby script or  a  longish  shell
                  script all fit here.
@@ -104,7 +99,6 @@ SHDAT
        then STDIN will be read.
 
           -b <size>
-
                  The  size  of data chunks to place in each HERE document. The
                  argument is a positive integer followed by suffixes  like  B,
                  K,  KiB,  M and MiB, in the manner of dd, head and many other
@@ -113,7 +107,6 @@ SHDAT
                  run on a memory-constrained system.
 
           -o <path>
-
                  By default, the generated script is sent to STDOUT. With  -o,
                  output is redirected to the given path.
 
