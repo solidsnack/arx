@@ -43,7 +43,7 @@ data Class = EnvBinding    -- ^ An 'EnvBinding' has the form
                            --   lower-case letters and digits, and may be
                            --   multi-part, with each part separated by a @+@
                            --   or @/@ (for example, @git+ssh@). An example
-                           --   URL: @http://example.com/?q=special
+                           --   URL: @http://example.com/?q=special@.
            | HexNum        -- ^ A 'HexNum' is a sequence of hexadecimal
                            --   digits, upper or lower case, beginning with
                            --   @0x@; for example: @0x01a3@.

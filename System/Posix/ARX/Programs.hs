@@ -32,7 +32,7 @@ class ARX program where
 {-| An 'SHDAT' program processes byte streams with the specified chunking to
     produce a script.
  -}
-newtype SHDAT                =  SHDAT Word  -- ^ Chunk size.
+newtype SHDAT                =  SHDAT Word  -- Chunk size.
 instance ARX SHDAT where
   type Input SHDAT           =  LazyB.ByteString
   interpret (SHDAT w) bytes  =  mconcat (chunked bytes)
@@ -53,10 +53,10 @@ instance ARX SHDAT where
     written along side the temporary work location, to ensure it does not
     collide with any files in the archive.
  -}
-data TMPX = TMPX SHDAT LazyB.ByteString -- ^ Code of task to run.
-                       [(Sh.Var, Sh.Val)] -- ^ Environment mapping.
-                       Bool -- ^ Destroy tmp if task runs successfully.
-                       Bool -- ^ Destroy tmp if task exits with an error code.
+data TMPX = TMPX SHDAT LazyB.ByteString -- Code of task to run.
+                       [(Sh.Var, Sh.Val)] -- Environment mapping.
+                       Bool -- Destroy tmp if task runs successfully.
+                       Bool -- Destroy tmp if task exits with an error code.
 instance ARX TMPX where
   type Input TMPX            =  [(Tar, LazyB.ByteString)]
   interpret (TMPX encoder run env rm0 rm1) stuff = TMPXTools.render

@@ -39,10 +39,10 @@ import System.Posix.ARX.BlazeIsString
     stored in an 'EncodedChunk'.
  -}
 data Chunk                   =  SafeChunk !ByteString
-                             |  EncodedChunk !ByteString -- ^ Encoded data.
-                                             !Int        -- ^ Original length.
-                                             !EscapeChar -- ^ Null replacer.
-                                             !EscapeChar -- ^ Escaper.
+                             |  EncodedChunk !ByteString -- Encoded data.
+                                             !Int        -- Original length.
+                                             !EscapeChar -- Null replacer.
+                                             !EscapeChar -- Escaper.
 deriving instance Show Chunk
 instance IsString Chunk where
   fromString                 =  chunk . Data.ByteString.Char8.pack
@@ -72,6 +72,7 @@ instance IsString Chunk where
     distributed over the bytes -- as we might expect of compressed tarballs --
     we expect a size growth of two 256ths, or less than 0.8 percent.
  -}
+chunk                       ::  ByteString -> Chunk
 chunk block
   | safeForHereDoc block     =  SafeChunk block
   | otherwise                =  EncodedChunk (encode nW eW block)
@@ -148,9 +149,9 @@ decode nullReplaceByte escapeByte = (unEscape . Bytes.map unReplace)
     - interpret the double escape sequence and unset the escape flag.
     -}
 
-data EscapeChar = EscapeChar !Word8 !ByteString -- ^ For @tr@ char list.
-                                    !ByteString -- ^ For @sed@ pattern.
-                                    !ByteString -- ^ For @sed@ replacement.
+data EscapeChar = EscapeChar !Word8 !ByteString -- For @tr@ char list.
+                                    !ByteString -- For @sed@ pattern.
+                                    !ByteString -- For @sed@ replacement.
 deriving instance Show EscapeChar
 
 {-| The candidate escape characters, with the forms to be used in constructed
