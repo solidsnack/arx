@@ -1,4 +1,4 @@
-.TH "ARX" "1" "2011-11-08" "0.0.0" "arx"
+.TH "ARX" "1" "2011-11-09" "0.0.0" "arx"
 .SH NAME
 arx \- archived execution
 .
@@ -86,28 +86,23 @@ execution, the temporary directory is removed (or not, depending on the
 .INDENT 0.0
 .TP
 .B \fB\-ar <path>\fP
-.sp
 An archive to include in the generated shell script. If no archives are
 specified, or \fB\-ar \-\fP is given, then STDIN will be included.
 .TP
 .B \fB\-rm0\fP, \fB\-rm1\fP, \fB\-rm_\fP, \fB\-rm!\fP
-.sp
 By default, the temporary directory created by the script will be deleted
 no matter the exit status status of the task. These options cause a script
 to be generated that deletes the temporary directory only on success, only
 on failure, always (the default) or never.
 .TP
 .B \fB\-b <size>\fP
-.sp
 Please see the documentation for this option, shared with \fIshdat\fP, below.
 .TP
 .B \fB\-o <path>\fP
-.sp
 By default, the generated script is sent to STDOUT. With \fB\-o\fP, output is
 redirected to the given path.
 .TP
 .B \fB\-e <path>\fP
-.sp
 Causes the file specified to be packaged as the task to be run. A binary
 executable, a Ruby script or a longish shell script all fit here.
 .UNINDENT
@@ -149,7 +144,6 @@ then STDIN will be read.
 .INDENT 0.0
 .TP
 .B \fB\-b <size>\fP
-.sp
 The size of data chunks to place in each HERE document. The argument is a
 positive integer followed by suffixes like \fBB\fP, \fBK\fP, \fBKiB\fP, \fBM\fP
 and \fBMiB\fP, in the manner of \fBdd\fP, \fBhead\fP and many other tools. The
@@ -157,7 +151,6 @@ default is 4MiB.  This is unlikely to make a difference for you unless the
 generated script is intended to be run on a memory\-constrained system.
 .TP
 .B \fB\-o <path>\fP
-.sp
 By default, the generated script is sent to STDOUT. With \fB\-o\fP, output is
 redirected to the given path.
 .UNINDENT
