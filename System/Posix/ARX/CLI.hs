@@ -43,9 +43,7 @@ main                         =  do
       let apply i            =  interpret (SHDAT size) <$> inIOStream i
       mapM_ ((send out =<<) . apply) ins
     Right (Right tmpxArgs)  ->  do
-      let (size, out, ins, tars, env, (rm0, rm1), cmd) = tmpxResolve tmpxArgs
-      (ins /= []) `when` do err pUnsupported
-                            exitFailure
+      let (size, out, tars, env, (rm0, rm1), cmd) = tmpxResolve tmpxArgs
       case tmpxCheckStreams tars cmd of Nothing  -> return ()
                                         Just msg -> do die msg
       cmd'                  <-  openByteSource cmd
@@ -60,7 +58,6 @@ main                         =  do
   arx                        =  Left <$> shdat <|> Right <$> tmpx
   name STDIO                 =  "-"
   name (Path b)              =  b
-  pUnsupported = "Paths to archive are not supported in this version of tmpx."
   send o b                   =  (outIOStream o . Blaze.toLazyByteString) b
   openArchive io             =  do r <- arIOStream io
                                    return $ case r of Nothing -> Left (name io)
@@ -88,19 +85,19 @@ shdatCheckStreams ins        =  streamsMessage [ins']
 
 {-| Apply defaulting and overrides appropriate to 'TMPX' programs.
  -}
-tmpxResolve :: ( [Word], [IOStream], [ByteString], [IOStream],
-                 [(Var, Val)], [(Bool, Bool)], [ByteSource]  )
-            -> ( Word, IOStream, [ByteString], [IOStream],
-                 [(Var, Val)], (Bool, Bool), ByteSource  )
-tmpxResolve (sizes, outs, ins, tars, env, rms, cmds) =
-  (size, out, ins, tarsWithDefaulting, env, rm, cmd)
+tmpxResolve                 ::  ( [Word], [IOStream], [IOStream],
+                                  [(Var, Val)], [(Bool, Bool)], [ByteSource] )
+                            ->  ( Word, IOStream, [IOStream],
+                                  [(Var, Val)], (Bool, Bool), ByteSource )
+tmpxResolve (sizes, outs, tars, env, rms, cmds) =
+  (size, out, tarsWithDefaulting, env, rm, cmd)
  where
   size                       =  last (defaultBlock:sizes)
   out                        =  last (STDIO:outs)
   rm                         =  last ((True,True):rms)
   cmd                        =  last (defaultTask:cmds)
   tarsWithDefaulting
-    | ins == [] && tars == [] = [STDIO]
+    | tars == []             =  [STDIO]
     | otherwise              =  tars
 
 tmpxCheckStreams            ::  [IOStream] -> ByteSource -> Maybe ByteString

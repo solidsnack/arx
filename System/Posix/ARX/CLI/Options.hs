@@ -38,8 +38,8 @@ shdat                        =  do
     f (_, _, Just c) (as, bs, cs) = (as, bs, c:cs)
     f _ stuff                =  stuff
 
-tmpx :: ArgsParser ( [Word], [IOStream], [ByteString], [IOStream],
-                     [(Sh.Var, Sh.Val)], [(Bool, Bool)], [ByteSource]  )
+tmpx :: ArgsParser ( [Word], [IOStream], [IOStream], [(Sh.Var, Sh.Val)],
+                     [(Bool, Bool)], [ByteSource]                        )
 tmpx                         =  do
   arg "tmpx"
   bars                      <-  (try . lookAhead) slashes
@@ -47,38 +47,34 @@ tmpx                         =  do
                  Nothing    ->  flags eof
                  Just bars  ->  do let eof_bars = () <$ arg bars <|> eof
                                    before <- flags eof_bars
-                                   cmd <- _7 (gather eof_bars)
+                                   cmd <- _6 (gather eof_bars)
                                    after <- flags eof
                                    return (before ++ (cmd:after))
  where
   flags                      =  manyTill flag
   gather = (ByteString . Char8.unwords <$>) . manyTill anyArg
-  flag                       =  _1 blockSize <|> _2 outputFile <|> _3 qPath
-                            <|> _4 archive   <|> _5 env        <|> _6 rm
-                            <|> _7 scriptToRun
-  _1 = ((,Nothing,Nothing,Nothing,Nothing,Nothing,Nothing) . Just <$>)
-  _2 = ((Nothing,,Nothing,Nothing,Nothing,Nothing,Nothing) . Just <$>)
-  _3 = ((Nothing,Nothing,,Nothing,Nothing,Nothing,Nothing) . Just <$>)
-  _4 = ((Nothing,Nothing,Nothing,,Nothing,Nothing,Nothing) . Just <$>)
-  _5 = ((Nothing,Nothing,Nothing,Nothing,,Nothing,Nothing) . Just <$>)
-  _6 = ((Nothing,Nothing,Nothing,Nothing,Nothing,,Nothing) . Just <$>)
-  _7 = ((Nothing,Nothing,Nothing,Nothing,Nothing,Nothing,) . Just <$>)
-  coalesce                   =  foldr f ([], [], [], [], [], [], [])
+  flag                       =  _1 blockSize <|> _2 outputFile <|> _3 ioStream
+                            <|> _4 env       <|> _5 rm   <|> _6 scriptToRun
+  _1 = ((,Nothing,Nothing,Nothing,Nothing,Nothing) . Just <$>)
+  _2 = ((Nothing,,Nothing,Nothing,Nothing,Nothing) . Just <$>)
+  _3 = ((Nothing,Nothing,,Nothing,Nothing,Nothing) . Just <$>)
+  _4 = ((Nothing,Nothing,Nothing,,Nothing,Nothing) . Just <$>)
+  _5 = ((Nothing,Nothing,Nothing,Nothing,,Nothing) . Just <$>)
+  _6 = ((Nothing,Nothing,Nothing,Nothing,Nothing,) . Just <$>)
+  coalesce                   =  foldr f ([], [], [], [], [], [])
    where
-    f (Just a, _, _, _, _, _, _)   (as, bs, cs, ds, es, fs, gs)
-                                 = (a:as, bs, cs, ds, es, fs, gs)
-    f (_, Just b, _, _, _, _, _)   (as, bs, cs, ds, es, fs, gs)
-                                 = (as, b:bs, cs, ds, es, fs, gs)
-    f (_, _, Just c, _, _, _, _)   (as, bs, cs, ds, es, fs, gs)
-                                 = (as, bs, c:cs, ds, es, fs, gs)
-    f (_, _, _, Just d, _, _, _)   (as, bs, cs, ds, es, fs, gs)
-                                 = (as, bs, cs, d:ds, es, fs, gs)
-    f (_, _, _, _, Just e, _, _)   (as, bs, cs, ds, es, fs, gs)
-                                 = (as, bs, cs, ds, e:es, fs, gs)
-    f (_, _, _, _, _, Just f, _)   (as, bs, cs, ds, es, fs, gs)
-                                 = (as, bs, cs, ds, es, f:fs, gs)
-    f (_, _, _, _, _, _, Just g)   (as, bs, cs, ds, es, fs, gs)
-                                 = (as, bs, cs, ds, es, fs, g:gs)
+    f (Just a, _, _, _, _, _)   (as, bs, cs, ds, es, fs)
+                             =  (a:as, bs, cs, ds, es, fs)
+    f (_, Just b, _, _, _, _)   (as, bs, cs, ds, es, fs)
+                             =  (as, b:bs, cs, ds, es, fs)
+    f (_, _, Just c, _, _, _)   (as, bs, cs, ds, es, fs)
+                             =  (as, bs, c:cs, ds, es, fs)
+    f (_, _, _, Just d, _, _)   (as, bs, cs, ds, es, fs)
+                             =  (as, bs, cs, d:ds, es, fs)
+    f (_, _, _, _, Just e, _)   (as, bs, cs, ds, es, fs)
+                             =  (as, bs, cs, ds, e:es, fs)
+    f (_, _, _, _, _, Just f)   (as, bs, cs, ds, es, fs)
+                             =  (as, bs, cs, ds, es, f:fs)
     f _ stuff                =  stuff
 
 blockSize                   ::  ArgsParser Word
@@ -94,9 +90,6 @@ ioStream                     =  STDIO <$  tokCL Dash
 
 qPath                       ::  ArgsParser ByteString
 qPath                        =  tokCL QualifiedPath
-
-archive                     ::  ArgsParser IOStream
-archive                      =  arg "-ar" *> ioStream
 
 rm                          ::  ArgsParser (Bool, Bool)
 rm  =   (True,  False) <$ arg "-rm0"  <|>  (False, True) <$ arg "-rm1"
