@@ -1,16 +1,13 @@
+module System.Posix.ARX (
+    -- * Interface and implementation of subcommands.
+    ARX(..), SHDAT(..), TMPX(..),
+    -- * Creation of environment bindings for 'TMPX'.
+    Val, val, Var, var,
+    -- * Tar archive types and magic detection.
+    Tar(..), magic
+  ) where
 
-module System.Posix.ARX
-  ( module System.Posix.ARX.CLI,
-    module System.Posix.ARX.CLI.CLTokens,
-    module System.Posix.ARX.HEREDat,
-    module System.Posix.ARX.Programs,
-    module System.Posix.ARX.Sh,
-    module System.Posix.ARX.Tar          ) where
-
-import System.Posix.ARX.CLI
-import System.Posix.ARX.CLI.CLTokens
 import System.Posix.ARX.Programs
 import System.Posix.ARX.Sh
 import System.Posix.ARX.Tar
-import System.Posix.ARX.HEREDat
 
