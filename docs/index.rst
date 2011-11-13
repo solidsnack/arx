@@ -10,7 +10,7 @@ Synopsis
     arx ... (-h|-[?]|--help)? ...
     arx shdat (-b <size>)? (-o <output file>)? < input
     arx shdat (-b <size>)? (-o <output file>)? <input file>+
-    arx tmpx <options>* (//+ <shell command> (//+ <options>*)?)?
+    arx tmpx <option or archive>* (//+ <command> (//+ <option or archive>*)?)?
 
 Description
 -----------
@@ -60,16 +60,16 @@ executable or shell command in to a Bourne-compatible script that runs the
 command or executable in a temporary directory, after having unpacked the
 archives and set the environment.
 
+Any number of file path arguments may be specified; they will be interpreted
+as tar archives to include in bundled script. If no archives are specified, or
+``-`` is given, then STDIN will be included.
+
 The temporary directory created by the script is different for each
 invocation, with a name of the form ``/tmp/tmpx.<timestamp>.<pid>``. The
 timestamp used is a UTC, ISO 8601 format timestamp. One happy consequence of
 this is that earlier jobs sort ASCIIbetically before later jobs. After
 execution, the temporary directory is removed (or not, depending on the
 ``-rm[10!_]`` family of options).
-
-  ``-ar <path>``
-    An archive to include in the generated shell script. If no archives are
-    specified, or ``-ar -`` is given, then STDIN will be included.
 
   ``-rm0``, ``-rm1``, ``-rm_``, ``-rm!``
     By default, the temporary directory created by the script will be deleted
@@ -144,8 +144,8 @@ Examples
   git archive HEAD | bzip2 | arx tmpx -rm0 -e ./build-script.py
 
   # Bundle an instance of an application with DB credentials and run it.
-  arx tmpx -rm! -ar ./app.tbz -ar ./stage-info.tgz // rake start | ssh ...
+  arx tmpx -rm! ./app.tbz ./stage-info.tgz // rake start | ssh ...
 
   # Get dump of linking info for build that works here but not there.
-  arx tmpx -ar ./server-build.tgz LD_DEBUG=files // ./bin/start | ssh ...
+  arx tmpx ./server-build.tgz LD_DEBUG=files // ./bin/start | ssh ...
 
