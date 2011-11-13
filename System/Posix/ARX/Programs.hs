@@ -1,5 +1,6 @@
 {-# LANGUAGE OverloadedStrings
            , StandaloneDeriving
+           , FlexibleInstances
            , MultiParamTypeClasses
            , FunctionalDependencies #-}
 
