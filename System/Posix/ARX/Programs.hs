@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings
-           , TypeFamilies
-           , StandaloneDeriving #-}
+           , StandaloneDeriving
+           , MultiParamTypeClasses
+           , FunctionalDependencies #-}
 
 module System.Posix.ARX.Programs where
 
@@ -24,17 +25,15 @@ import System.Posix.ARX.Tar
 
 {-| ARX subprograms process some input to produce a script.
  -}
-class ARX program where
-  type Input program        ::  *
-  interpret                 ::  program -> Input program -> Blaze.Builder
+class ARX program input | program -> input where
+  interpret                 ::  program -> input -> Blaze.Builder
 
 
 {-| An 'SHDAT' program processes byte streams with the specified chunking to
     produce a script.
  -}
 newtype SHDAT                =  SHDAT Word  -- Chunk size.
-instance ARX SHDAT where
-  type Input SHDAT           =  LazyB.ByteString
+instance ARX SHDAT LazyB.ByteString where
   interpret (SHDAT w) bytes  =  mconcat (chunked bytes)
    where
     chunkSize                =  min (fromIntegral w) maxBound
@@ -51,14 +50,17 @@ instance ARX SHDAT where
     environment information in that location. The command may be any
     executable file contents, modulo architectural compatibility. It is
     written along side the temporary work location, to ensure it does not
-    collide with any files in the archive.
+    collide with any files in the archive. The two boolean flags determine
+    when to delete the temporary directory. The first flag determines whether
+    or not to delete successful (exit code zero) runs; the second determines
+    whether or not to delete failed (exit code non-zero) runs.
  -}
+
 data TMPX = TMPX SHDAT LazyB.ByteString -- Code of task to run.
                        [(Sh.Var, Sh.Val)] -- Environment mapping.
                        Bool -- Destroy tmp if task runs successfully.
                        Bool -- Destroy tmp if task exits with an error code.
-instance ARX TMPX where
-  type Input TMPX            =  [(Tar, LazyB.ByteString)]
+instance ARX TMPX [(Tar, LazyB.ByteString)] where
   interpret (TMPX encoder run env rm0 rm1) stuff = TMPXTools.render
     (TMPXTools.Template rm0 rm1 env' run' archives)
    where

@@ -75,10 +75,11 @@ library
                                 System.Posix.ARX.Tar
                                 System.Posix.ARX.TMPXTools
   extensions                  : FlexibleInstances
+                                FunctionalDependencies
+                                MultiParamTypeClasses
                                 OverloadedStrings
                                 StandaloneDeriving
                                 TupleSections
-                                TypeFamilies
 
 
 executable                      arx
@@ -102,8 +103,9 @@ executable                      arx
                               , vector >= 0.9
                               , vector-algorithms >= 0.5.3
   extensions                  : FlexibleInstances
+                                FunctionalDependencies
+                                MultiParamTypeClasses
                                 OverloadedStrings
                                 StandaloneDeriving
                                 TupleSections
-                                TypeFamilies
 
