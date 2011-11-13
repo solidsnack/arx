@@ -15,8 +15,10 @@ DESCRIPTION
        The arx tool has no in-built notion of  remote  connections  or  server
        clusters;  all automation is captured as Bourne compatible scripts that
        use a small number of UNIX utilities in  a  broadly  portable  way.  At
-       present, the utilities used are sed, tr, head, tar, bzip2 and gzip. The
-       generated scripts can be piped to ssh to be executed remotely.
+       present,  the  utilities  used are sed, tr, head, and tar. The calls to
+       tar sometimes use -j and -z; these calls to tar may result in calls  to
+       bzip2 and gzip. Scripts have been tested with dash and the GNU tools as
+       well as the sh and tools that are part of busybox.
 
        The tmpx subcommand of arx offers a variety  of  options  for  bundling
        code  and  a  task to run. The shdat subcommand exposes the lower-level
@@ -47,11 +49,13 @@ TMPX
        depending on the -rm[10!_] family of options).
 
           -ar <path>
+
                  An  archive  to  include in the generated shell script. If no
                  archives are specified, or -ar - is given, then STDIN will be
                  included.
 
           -rm0, -rm1, -rm_, -rm!
+
                  By  default,  the  temporary  directory created by the script
                  will be deleted no matter the exit status status of the task.
                  These options cause a script to be generated that deletes the
@@ -59,14 +63,17 @@ TMPX
                  (the default) or never.
 
           -b <size>
+
                  Please  see  the  documentation  for this option, shared with
                  shdat, below.
 
           -o <path>
+
                  By default, the generated script is sent to STDOUT. With  -o,
                  output is redirected to the given path.
 
           -e <path>
+
                  Causes  the  file  specified to be packaged as the task to be
                  run. A binary executable, a Ruby script or  a  longish  shell
                  script all fit here.
@@ -99,6 +106,7 @@ SHDAT
        then STDIN will be read.
 
           -b <size>
+
                  The  size  of data chunks to place in each HERE document. The
                  argument is a positive integer followed by suffixes  like  B,
                  K,  KiB,  M and MiB, in the manner of dd, head and many other
@@ -107,6 +115,7 @@ SHDAT
                  run on a memory-constrained system.
 
           -o <path>
+
                  By default, the generated script is sent to STDOUT. With  -o,
                  output is redirected to the given path.
 
