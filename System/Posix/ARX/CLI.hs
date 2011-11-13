@@ -26,9 +26,7 @@ import Text.Parsec hiding (satisfy, (<|>))
 import System.Posix.ARX.CLI.CLTokens (Class(..))
 import qualified System.Posix.ARX.CLI.CLTokens as CLTokens
 import System.Posix.ARX.CLI.Options
-import System.Posix.ARX.Programs
-import qualified System.Posix.ARX.Sh as Sh
-import System.Posix.ARX.Tar
+import System.Posix.ARX
 
 
 {-| Run CLI tool, processing arguments and options.
@@ -91,9 +89,9 @@ shdatCheckStreams ins        =  streamsMessage [ins']
 {-| Apply defaulting and overrides appropriate to 'TMPX' programs.
  -}
 tmpxResolve :: ( [Word], [IOStream], [ByteString], [IOStream],
-                 [(Sh.Var, Sh.Val)], [(Bool, Bool)], [ByteSource]  )
+                 [(Var, Val)], [(Bool, Bool)], [ByteSource]  )
             -> ( Word, IOStream, [ByteString], [IOStream],
-                 [(Sh.Var, Sh.Val)], (Bool, Bool), ByteSource  )
+                 [(Var, Val)], (Bool, Bool), ByteSource  )
 tmpxResolve (sizes, outs, ins, tars, env, rms, cmds) =
   (size, out, ins, tarsWithDefaulting, env, rm, cmd)
  where
@@ -116,7 +114,7 @@ tmpxCheckStreams tars cmd    =  streamsMessage [tars', cmd']
     | cmd == IOStream STDIO  =  One "as a command input"
     | otherwise              =  Zero
 
-tmpxOpen :: Word -> [(Sh.Var, Sh.Val)] -> (Bool, Bool) -> ByteSource -> IO TMPX
+tmpxOpen :: Word -> [(Var, Val)] -> (Bool, Bool) -> ByteSource -> IO TMPX
 tmpxOpen size env (rm0, rm1) cmd = do
   text                      <-  case cmd of
     ByteString b            ->  return (LazyB.fromChunks [b])
