@@ -7,7 +7,29 @@ author                        : Jason Dusek
 maintainer                    : oss@solidsnack.be
 homepage                      : http://github.com/solidsnack/arx/
 synopsis                      : Archive execution tool.
-description                   : Archive execution tool.
+description                   :
+  The @ARX@ system provides services for packaging, deploying and running
+  source code. No particular format or framework is needed -- a directory of
+  code and a command to run are enough. The system has no in-built notion of
+  remote connections, job servers or clusters; all automation is captured as
+  Bourne compatible scripts.
+  .
+  An archive of the source code, a command and optionally an environment are
+  encoded together in a Bourne shell script that uses a small number of UNIX
+  utilities in a broadly portable way. The generated scripts can be run
+  directly or fed to @sh@ on STDIN. This latter feature is useful when one
+  would like to use @ssh@ and @sudo@ to set an appropriate executation
+  context, for example running: @ssh user\@example.com sudo sh@.
+  .
+  The shell tools used are @head@, @sed@, @tr@, @tar@, @bzip2@ and @gzip@.
+  Scripts have been tested with @dash@ and the GNU tools as well as the shell
+  and tools that come with @busybox@.
+  .
+  The @arx@ command line tool provides the @tmpx@ subcommand for preparing
+  jobs to run and the @shdat@ subcommand for access to the low-level shell
+  encoder. The @System.Posix.ARX@ module provides access to the routines used
+  for constructing commands and environments, describing archives and building
+  Bourne shell scripts.
 
 cabal-version                 : >= 1.6
 build-type                    : Simple
