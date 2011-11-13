@@ -57,7 +57,6 @@ library
                               , attoparsec >= 0.9.1.2
                               , blaze-builder >= 0.3
                               , bytestring-nums >= 0.3.3
-                              , bzlib >= 0.5
                               , file-embed >= 0.0.4.1
                               , parsec >= 3.1.2
                               , process >= 1.0
@@ -94,7 +93,6 @@ executable                      arx
                               , attoparsec >= 0.9.1.2
                               , blaze-builder >= 0.3
                               , bytestring-nums >= 0.3.3
-                              , bzlib >= 0.5
                               , file-embed >= 0.0.4.1
                               , parsec >= 3.1.2
                               , process >= 1.0

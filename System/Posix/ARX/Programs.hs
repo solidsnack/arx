@@ -14,7 +14,6 @@ import Data.Monoid
 import Data.Word
 
 import qualified Blaze.ByteString.Builder as Blaze
-import qualified Codec.Compression.BZip as BZip
 
 import System.Posix.ARX.BlazeIsString -- Most string literals are builders.
 import System.Posix.ARX.HEREDat
@@ -70,7 +69,7 @@ instance ARX TMPX [(Tar, LazyB.ByteString)] where
     flags TAR                =  "-x"
     flags TGZ                =  "-x -z"
     flags TBZ                =  "-x -j"
-    run'                     =  (shdat . BZip.compress) run
-    env' = (shdat . BZip.compress . Blaze.toLazyByteString . Sh.render) env
+    run'                     =  shdat run
+    env' = (shdat . Blaze.toLazyByteString . Sh.render) env
     shdat                    =  interpret encoder
 

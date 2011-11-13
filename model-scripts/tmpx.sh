@@ -21,8 +21,8 @@ then
   cd $dir
 fi
 go () {
-  unpack_env | bzcat > ./env
-  unpack_run | bzcat > ./run ; chmod ug+x ./run
+  unpack_env > ./env
+  unpack_run > ./run ; chmod ug+x ./run
   mkdir dat
   cd dat
   unpack_dat
