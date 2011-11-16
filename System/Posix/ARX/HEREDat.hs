@@ -105,13 +105,20 @@ chunk block
     prevent their further interpretation.
  -}
 encode                      ::  Word8 -> Word8 -> ByteString -> ByteString
-encode nullReplaceByte escapeByte = Bytes.concatMap rewrite
+encode nullReplaceByte escapeByte =
+  Blaze.toByteString . Bytes.foldr f mempty
  where
+  f b builder                =  rewrite b `mappend` builder
   rewrite b
-    | b == 0x00              =  Bytes.singleton nullReplaceByte
-    | b == escapeByte        =  Bytes.pack      [escapeByte, Bytes.c2w '_']
-    | b == nullReplaceByte   =  Bytes.pack      [escapeByte, escapeByte]
-    | otherwise              =  Bytes.singleton b
+    | b == 0x00              =  nullReplacer
+    | b == escapeByte        =  escapedEscaper
+    | b == nullReplaceByte   =  escapedNullReplacer
+    | otherwise              =  Blaze.fromWord8 b
+  nullReplacer               =  Blaze.fromWord8 nullReplaceByte
+  escaper                    =  Blaze.fromWord8 escapeByte
+  underscore                 =  Blaze.fromChar '_'
+  escapedEscaper             =  mappend escaper underscore
+  escapedNullReplacer        =  mappend escaper escaper
 
 {-| Given the byte used to replace nulls and the escape byte, undoes the result
     of the encode operation -- rewriting null replacers to literal nulls and
