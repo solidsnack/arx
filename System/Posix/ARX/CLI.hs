@@ -53,7 +53,7 @@ main                         =  do
                                 "The file magic of some archives:"
                                 badAr
                                 "could not be interpreted."
-      send out (interpret tmpx goodAr)
+      send out (shebang `mappend` interpret tmpx goodAr)
  where
   arx                        =  Left <$> shdat <|> Right <$> tmpx
   name STDIO                 =  "-"
@@ -62,6 +62,8 @@ main                         =  do
   openArchive io             =  do r <- arIOStream io
                                    return $ case r of Nothing -> Left (name io)
                                                       Just x  -> Right x
+  -- When Canonical's AMIs launch, they run userdata with an explicit #! line.
+  shebang                    =  "#!/bin/sh\n"
 
 {-| Apply defaulting and overrides appropriate to 'SHDAT' programs.
  -}
