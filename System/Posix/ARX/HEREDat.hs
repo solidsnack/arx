@@ -105,20 +105,26 @@ chunk block
     prevent their further interpretation.
  -}
 encode                      ::  Word8 -> Word8 -> ByteString -> ByteString
-encode nullReplaceByte escapeByte =
-  Blaze.toByteString . Bytes.foldr f mempty
+encode nullReplaceByte escapeByte bytes =
+  fst $ Bytes.unfoldrN len f (Nothing, bytes)
  where
-  f b builder                =  rewrite b `mappend` builder
+  --  The encoding should introduce at most 10% overhead; we allocate a little
+  --  more just to be safe. This allows us to make use of the somewhat faster
+  --  unfoldrN function (which probably pre-allocates).
+  len = ceiling (fromIntegral (Bytes.length bytes) * 1.25)
+  -- The worker sometimes floats up a byte, sometimes escapes a byte and
+  -- introduces a byte to be 'carried' (like carryies in arithmetic) and
+  -- sometimes floats up the carried byte.
+  f (Just carried, bytes)    =  Just (carried, (Nothing, bytes))
+  f (Nothing     , bytes)    =  do
+    ((b, carry), t)         <-  first rewrite <$> Bytes.uncons bytes
+    Just (b, (carry, t))
   rewrite b
-    | b == 0x00              =  nullReplacer
-    | b == escapeByte        =  escapedEscaper
-    | b == nullReplaceByte   =  escapedNullReplacer
-    | otherwise              =  Blaze.fromWord8 b
-  nullReplacer               =  Blaze.fromWord8 nullReplaceByte
-  escaper                    =  Blaze.fromWord8 escapeByte
-  underscore                 =  Blaze.fromChar '_'
-  escapedEscaper             =  mappend escaper underscore
-  escapedNullReplacer        =  mappend escaper escaper
+    | b == 0x00              =  (nullReplaceByte, Nothing)
+    | b == escapeByte        =  (escapeByte     , Just underscore)
+    | b == nullReplaceByte   =  (escapeByte     , Just escapeByte)
+    | otherwise              =  (b              , Nothing)
+  underscore                 =  Bytes.c2w '_'
 
 {-| Given the byte used to replace nulls and the escape byte, undoes the result
     of the encode operation -- rewriting null replacers to literal nulls and
