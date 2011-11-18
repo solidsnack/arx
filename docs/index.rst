@@ -149,7 +149,17 @@ Examples
   # Get dump of linking info for build that works here but not there.
   arx tmpx ./server-build.tgz LD_DEBUG=files // ./bin/start | ssh ...
 
-  # Command line used to test out Cabal source distributions of this package:
+  # Test out Cabal source distribution of this package:
   arx tmpx // 'cd arx-* && cabal configure && cabal build' // \
            -rm0 ./dist/arx-0.0.0.tar.gz | sh
+
+Bugs
+----
+
+The command line parser offers no hints or help of any kind; it fails with the
+simple message "argument error". The two most common mistakes I make are:
+
+* Not qualifying paths with ``/``, ``./`` or ``../``.
+
+* Not specifying a subcommand (`tmpx` or `shdat`).
 

@@ -1,4 +1,4 @@
-.TH "ARX" "1" "2011-11-13" "0.0.0" "arx"
+.TH "ARX" "1" "2011-11-18" "0.0.0" "arx"
 .SH NAME
 arx \- archived execution
 .
@@ -191,8 +191,24 @@ arx tmpx \-rm! ./app.tbz ./stage\-info.tgz // rake start | ssh ...
 
 # Get dump of linking info for build that works here but not there.
 arx tmpx ./server\-build.tgz LD_DEBUG=files // ./bin/start | ssh ...
+
+# Test out Cabal source distribution of this package:
+arx tmpx // \(aqcd arx\-* && cabal configure && cabal build\(aq // \e
+         \-rm0 ./dist/arx\-0.0.0.tar.gz | sh
 .ft P
 .fi
+.SH BUGS
+.sp
+The command line parser offers no hints or help of any kind; it fails with the
+simple message "argument error". The two most common mistakes I make are:
+.INDENT 0.0
+.IP \(bu 2
+.
+Not qualifying paths with \fB/\fP, \fB./\fP or \fB../\fP.
+.IP \(bu 2
+.
+Not specifying a subcommand (\fItmpx\fP or \fIshdat\fP).
+.UNINDENT
 .SH AUTHOR
 Jason Dusek
 .SH COPYRIGHT
