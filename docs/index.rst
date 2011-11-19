@@ -10,7 +10,7 @@ Synopsis
     arx ... (-h|-[?]|--help)? ...
     arx shdat (-b <size>)? (-o <output file>)? < input
     arx shdat (-b <size>)? (-o <output file>)? <input file>+
-    arx tmpx <option or archive>* (//+ <command> (//+ <option or archive>*)?)?
+    arx tmpx <option,archive>* (//+ <command> (//+ <option,archive>*)?)?
 
 Description
 -----------
