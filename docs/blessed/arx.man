@@ -52,7 +52,7 @@ infrastructure.
 The \fIarx\fP tool has no in\-built notion of remote connections or server
 clusters; all automation is captured as Bourne compatible scripts that use a
 small number of UNIX utilities in a broadly portable way. At present, the
-utilities used are \fIsed\fP, \fItr\fP, \fIhead\fP, and \fItar\fP. The calls to \fItar\fP
+utilities used are \fIsed\fP, \fItr\fP, \fIdate\fP, \fIhead\fP, and \fItar\fP. The calls to \fItar\fP
 sometimes use \fI\-j\fP and \fI\-z\fP; these calls to \fItar\fP may result in calls to
 \fIbzip2\fP and \fIgzip\fP. Scripts have been tested with \fIdash\fP and the GNU tools as
 well as the \fIsh\fP and tools that are part of \fIbusybox\fP.

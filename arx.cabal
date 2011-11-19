@@ -21,10 +21,10 @@ description                   :
   would like to use @ssh@ and @sudo@ to set an appropriate executation
   context, for example running: @ssh user\@example.com sudo sh@.
   .
-  The shell tools used are @head@, @sed@, @tr@ and @tar@. The calls to @tar@
-  sometimes use @-j@ and @-z@; these calls to @tar@ may result in calls to
-  @bzip2@ and @gzip@. Scripts have been tested with @dash@ and the GNU tools
-  as well as the @sh@ and tools that are part of @busybox@.
+  The shell tools used are @head@, @sed@, @date@, @tr@ and @tar@. The calls to
+  @tar@ sometimes use @-j@ and @-z@; these calls to @tar@ may result in calls
+  to @bzip2@ and @gzip@. Scripts have been tested with @dash@ and the GNU
+  tools as well as the @sh@ and tools that are part of @busybox@.
   .
   The @arx@ command line tool provides the @tmpx@ subcommand for preparing
   jobs to run and the @shdat@ subcommand for access to the low-level shell

@@ -25,7 +25,7 @@ infrastructure.
 The `arx` tool has no in-built notion of remote connections or server
 clusters; all automation is captured as Bourne compatible scripts that use a
 small number of UNIX utilities in a broadly portable way. At present, the
-utilities used are `sed`, `tr`, `head`, and `tar`. The calls to `tar`
+utilities used are `sed`, `tr`, `date`, `head`, and `tar`. The calls to `tar`
 sometimes use `-j` and `-z`; these calls to `tar` may result in calls to
 `bzip2` and `gzip`. Scripts have been tested with `dash` and the GNU tools as
 well as the `sh` and tools that are part of `busybox`.
