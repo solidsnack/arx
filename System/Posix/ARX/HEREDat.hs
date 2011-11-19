@@ -51,11 +51,6 @@ instance IsString Chunk where
     document and annotates with information to construct a shell decoder for
     that document, if necessary.
 
-    When a 'ByteString' contains no nulls, no escaping is needed: HERE
-    documents with a "quoted delimiter" do not undergo any variable
-    interpolation or escape sequence interpretation whatsoever (such HERE
-    documents happen to print much faster than the unquoted delimiter kind).
-
     A 'ByteString' with nulls is rewritten in a complicated way. Two escape
     characters are chosen from a class of ASCII printable characters that look
     like reasonable escape characters; the two that show up least frequently
@@ -73,10 +68,11 @@ instance IsString Chunk where
     we expect a size growth of two 256ths, or less than 0.8 percent.
  -}
 chunk                       ::  ByteString -> Chunk
-chunk block
-  | safeForHereDoc block     =  SafeChunk block
-  | otherwise                =  EncodedChunk (encode nW eW block)
+chunk block                  =  EncodedChunk (encode nW eW block)
                                              (Bytes.length block) nEsc eEsc
+--  | safeForHereDoc block     =  SafeChunk block
+--  | otherwise                =  EncodedChunk (encode nW eW block)
+--                                             (Bytes.length block) nEsc eEsc
  where
   nEsc@(EscapeChar nW _ _ _) :
     eEsc@(EscapeChar eW _ _ _) : _ = snd <$> List.sortBy (comparing cmp) counts
