@@ -15,8 +15,14 @@ then
   dir=/tmp/tmpx.`date -u +%FT%TZ`.$$
   rm -rf $dir
   : ${rm_:=true}
-  ! $rm_ || trap "! \$rm_ || rm -rf $dir" EXIT
-  trap "exit 2" HUP INT QUIT BUS SEGV PIPE TERM
+  if $rm_
+  then
+    trap "case \$?/$rm0/$rm1 in
+            0/true/*)      rm -rf $dir ;;
+            [1-9]*/*/true) rm -rf $dir ;;
+          esac" EXIT
+    trap "exit 2" HUP INT QUIT BUS SEGV PIPE TERM
+  fi
   mkdir $dir
   cd $dir
 fi
@@ -28,15 +34,7 @@ go () {
   unpack_dat
   if $run
   then
-    if ( . ../env && ../run )
-    then
-      ext=$?
-      rm_=$rm0
-    else
-      ext=$?
-      rm_=$rm1
-    fi
-    exit $ext
+    ( . ../env && ../run )
   fi
 }
 unpack_env () { : # NOOP
