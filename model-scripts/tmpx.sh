@@ -1,3 +1,4 @@
+#!/bin/sh
 set -e -u
 unset rm_ dir
 tmp=true ; run=true
