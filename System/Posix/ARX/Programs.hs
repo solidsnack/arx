@@ -34,8 +34,9 @@ class ARX program input | program -> input where
  -}
 newtype SHDAT                =  SHDAT Word  -- Chunk size.
 instance ARX SHDAT LazyB.ByteString where
-  interpret (SHDAT w) bytes  =  mconcat (chunked bytes)
+  interpret (SHDAT w)        =  localeC . mconcat . chunked
    where
+    localeC b                =  "( LC_ALL=C\n" `mappend` b `mappend` ")"
     chunkSize                =  min (fromIntegral w) maxBound
     chunked input            =  case LazyB.splitAt chunkSize input of
       ("", "")              ->  []
