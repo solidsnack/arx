@@ -67,11 +67,15 @@ instance ARX TMPX [(Tar, LazyB.ByteString)] where
    where
     archives                 =  mconcat (uncurry archive <$> stuff)
     archive tar bytes        =  mconcat
-      ["{\n", shdat bytes, "} | tar ", flags tar, "\n"]
+      [shdat bytes, " | tar ", flags tar, "\n"]
     flags TAR                =  "-x"
     flags TGZ                =  "-x -z"
     flags TBZ                =  "-x -j"
-    run'                     =  shdat run
-    env' = (shdat . Blaze.toLazyByteString . Sh.render) env
+    run' = case run of ""   ->  ""
+                       _    ->  shdat run
+    env' = case env of _:_  ->  (shdat . unblz . Sh.render) env
+                       [ ]  ->  ""
     shdat                    =  interpret encoder
+    unblz                    =  Blaze.toLazyByteString
+
 
