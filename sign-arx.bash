@@ -19,6 +19,8 @@ else
   sedRE=(sed -E)
 fi
 
+d=./tmp/signed
+
 function sedRE {
   "${sedRE[@]}" "$@"
 }
@@ -36,19 +38,17 @@ function sign_and_sum {
   local file="$1"
   local platform="$2"
   local version="$3"
-  local signed="$(basename "$file")"-"$version"-"$platform"
-  mkdir -p ./signed
-  echo "Copying binary to ./signed/$signed" >&2
-  rsync -qa "$file" ./signed/"$signed" 1>&2
-  echo "Creating signature file, ./signed/$signed.sig" >&2
-  gpg --detach-sign ./signed/"$signed"
-  echo "Creating SHA 512 sum, ./signed/$signed.sha512" >&2
-  ( cd ./signed
-    shasum --portable --algorithm 512 "$signed" > ./"$signed.sha512" )
-  echo "$signed"
+  local bin="$(basename "$file")"-"$version"-"$platform"
+  mkdir -p "$d"
+  echo "Copying binary to $d/$bin" >&2
+  rsync -qa "$file" "$d/$bin"
+  echo "Creating GPG signature file, $d/$bin.sig" >&2
+  gpg --use-agent --detach-sign "$d/$bin"
+  echo "Creating SHA 512 sum, $d/$bin.sha512" >&2
+  ( cd "$d" && shasum --portable --algorithm 512 "$bin" > ./"$bin.sha512" )
 }
 
-declare -a sign_args=('./dist/build/arx/arx')
+declare -a sign_args=('./tmp/arx')
 while [[ $# != 0 ]]
 do
   case "$1" in
@@ -68,12 +68,12 @@ case "${#sign_args[@]}" in
   *) echo 'Bad arguments.' ; exit 2 ;;
 esac
 
-echo 'Running Cabal to build binary...' >&2
-if ! { cabal configure && cabal build ;} &>/dev/null
+echo 'Building stripped binary...' >&2
+if ! make ./tmp/arx &>/dev/null
 then
   echo 'Error running cabal!' >&2
   exit 4
 fi
-res="$(sign_and_sum "${sign_args[@]}" "$(version)")"
+sign_and_sum "${sign_args[@]}" "$(version)"
 echo "Created binary, signature and checksum." >&2
 
