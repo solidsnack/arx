@@ -31,21 +31,27 @@ function version {
 
 function ghc_target {
   ghc --info |
-  sedRE -n '/^.+"Target platform","([^-]+)-([^"]+)".+$/ { s//\1 \2/ ; p ;}'
+  sedRE -n '/^.+"Target platform","([^-]+)-([^"]+)".+$/ { s//\1 \2/ ; p ;}' |
+  sedRE 's/x86_64/amd64/'
 }
 
 function sign_and_sum {
   local file="$1"
+  local name="$(basename "$file")"
   local platform="$2"
   local version="$3"
-  local bin="$(basename "$file")"-"$version"-"$platform"
-  mkdir -p "$d"
-  echo "Copying binary to $d/$bin" >&2
-  rsync -qa "$file" "$d/$bin"
-  echo "Creating GPG signature file, $d/$bin.sig" >&2
-  gpg --use-agent --detach-sign "$d/$bin"
-  echo "Creating SHA 512 sum, $d/$bin.sha512" >&2
-  ( cd "$d" && shasum --portable --algorithm 512 "$bin" > ./"$bin.sha512" )
+  local v="$(basename "$file")"-"$version"-"$platform"
+  mkdir -p "$d/$v"
+  echo "Copying binary to $d/$v/$name" >&2
+  rsync -qa "$file" "$d/$v/$name"
+  echo "Creating GPG signature file, $d/$v/$name.sig" >&2
+  rm -f "$d/$v/$name".sig
+  gpg --use-agent --detach-sign "$d/$v/$name"
+  echo "Creating SHA 512 sum, $d/$v/$name.sha" >&2
+  ( cd "$d/$v" &&
+    shasum --portable --algorithm 512 "$name" > ./"$name.sha" )
+  echo "Creating archive, $d/$v.tbz" >&2
+  ( cd "$d" && tar cjf "$v".tbz "$v" )
 }
 
 declare -a sign_args=('./tmp/arx')
@@ -75,5 +81,4 @@ then
   exit 4
 fi
 sign_and_sum "${sign_args[@]}" "$(version)"
-echo "Created binary, signature and checksum." >&2
 
