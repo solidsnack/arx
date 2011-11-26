@@ -32,7 +32,7 @@ description                   :
   for constructing commands and environments, describing archives and building
   Bourne shell scripts.
   .
-  One way I have used @arx@ is to dest the Cabal source archive for this
+  One way I have used @arx@ is to test the Cabal source archive for this
   package:
   .
   @
