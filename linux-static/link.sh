@@ -122,10 +122,8 @@
   -lHSarray-0.3.0.2 \
   -lHSbase-4.3.1.0 \
   -lHSinteger-gmp-0.2.0.3 \
-  -lgmp \
   -lHSghc-prim-0.2.0.0 \
   -lHSrts \
-  -lffi \
   -lm \
   -lrt \
   -ldl \
@@ -136,4 +134,7 @@
   -lgcc_s --no-as-needed \
   /usr/lib/gcc/x86_64-linux-gnu/4.6.1/crtend.o \
   /usr/lib/gcc/x86_64-linux-gnu/4.6.1/../../../x86_64-linux-gnu/crtn.o \
+  -static \
+  -lgmp \
+  -lffi \
 
