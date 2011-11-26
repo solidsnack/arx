@@ -35,6 +35,19 @@ function ghc_target {
   sedRE 's/x86_64/amd64/'
 }
 
+function mk_arx {
+  local target=''
+  { { uname -a | fgrep -q Ubuntu ;} && target=./tmp/arx.ubuntu ;} ||
+  { { uname -a | fgrep -q Darwin ;} && target=./tmp/arx.osx ;} ||
+  { echo 'Unknown target...' >&2 ; exit 4 ;}
+  if ! make "$target" >&/dev/null
+  then
+    echo 'Build error!' >&2
+    exit 4
+  fi
+  mv "$target" ./tmp/arx
+}
+
 function sign_and_sum {
   local file="$1"
   local name="$(basename "$file")"
@@ -54,12 +67,14 @@ function sign_and_sum {
   ( cd "$d" && tar cjf "$v".tbz "$v" )
 }
 
+mk=true
 declare -a sign_args=('./tmp/arx')
 while [[ $# != 0 ]]
 do
   case "$1" in
     -h|-'?'|--help) usage ; exit ;;
     --debug-mode) "$@" ;;
+    --no-mk) mk=false ;;
     *) case "${#sign_args[@]}" in
          1) sign_args[1]="$1" ;;
          *) echo 'Bad args.' ; exit 2 ;;
@@ -74,11 +89,10 @@ case "${#sign_args[@]}" in
   *) echo 'Bad arguments.' ; exit 2 ;;
 esac
 
-echo 'Building stripped binary...' >&2
-if ! make ./tmp/arx &>/dev/null
+if $mk
 then
-  echo 'Error running cabal!' >&2
-  exit 4
+  echo 'Building stripped binary...' >&2
+  mk_arx
 fi
 sign_and_sum "${sign_args[@]}" "$(version)"
 
