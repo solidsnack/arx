@@ -1,7 +1,7 @@
 /usr/lib/gcc/x86_64-linux-gnu/4.6.1/collect2 \
   --build-id --no-add-needed --as-needed --eh-frame-hdr -m elf_x86_64 \
   --hash-style=gnu -dynamic-linker /lib64/ld-linux-x86-64.so.2 \
-  -z relro -o arx \
+  -z relro -o "${1:-arx}" \
   -u ghczmprim_GHCziTypes_Izh_static_info \
   -u ghczmprim_GHCziTypes_Czh_static_info \
   -u ghczmprim_GHCziTypes_Fzh_static_info \
