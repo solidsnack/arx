@@ -31,6 +31,20 @@ description                   :
   encoder. The @System.Posix.ARX@ module provides access to the routines used
   for constructing commands and environments, describing archives and building
   Bourne shell scripts.
+  .
+  One way I have used @arx@ is to dest the Cabal source archive for this
+  package:
+  .
+  @
+  arx tmpx .\/dist\/arx-* \/\/ 'cd arx-* && cabal configure && cabal build' | sh
+  @
+  .
+  There are binary @arx@ command line tool releases available from:
+  .
+    <https://github.com/solidsnack/arx/downloads>
+  .
+  For each supported platform, there is an archive containing @arx@ and
+  signature files (SHA 512 and GPG).
 
 cabal-version                 : >= 1.6
 build-type                    : Simple
