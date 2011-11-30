@@ -17,7 +17,6 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 
 import Data.Attoparsec.Char8
-import Data.Attoparsec.FastSet
 
 
 {-| Non-overlapping classes of command line argument strings.
