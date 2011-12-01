@@ -9,14 +9,16 @@
 module System.Posix.ARX.CLI.CLTokens where
 
 import Prelude hiding (takeWhile)
-import Control.Applicative hiding (many)
+import Control.Applicative
 import Data.ByteString (ByteString)
 import Data.ByteString.Char8 ()
 import Data.Either
 import Data.Map (Map)
 import qualified Data.Map as Map
 
-import Data.Attoparsec.Char8
+import Data.Attoparsec.Char8 ( char8, choice, decimal, endOfInput, inClass,
+                               isDigit, parseOnly, Parser, satisfy, string,
+                               takeWhile, takeWhile1, try )
 
 
 {-| Non-overlapping classes of command line argument strings.
