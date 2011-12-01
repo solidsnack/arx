@@ -1,4 +1,4 @@
-.TH "ARX" "1" "2011-11-19" "0.0.0" "arx"
+.TH "ARX" "1" "2011-12-01" "0.0.4" "arx"
 .SH NAME
 arx \- archived execution
 .
