@@ -48,3 +48,4 @@ unpack_dat () { : # NOOP
   # To be set by tool.
 }
 go
+exit
