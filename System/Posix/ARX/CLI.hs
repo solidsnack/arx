@@ -90,15 +90,12 @@ tmpxResolve                 ::  ( [Word], [IOStream], [IOStream],
                             ->  ( Word, IOStream, [IOStream],
                                   [(Var, Val)], (Bool, Bool), ByteSource )
 tmpxResolve (sizes, outs, tars, env, rms, cmds) =
-  (size, out, tarsWithDefaulting, env, rm, cmd)
+  (size, out, tars, env, rm, cmd)
  where
   size                       =  last (defaultBlock:sizes)
   out                        =  last (STDIO:outs)
   rm                         =  last ((True,True):rms)
   cmd                        =  last (defaultTask:cmds)
-  tarsWithDefaulting
-    | tars == []             =  [STDIO]
-    | otherwise              =  tars
 
 tmpxCheckStreams            ::  [IOStream] -> ByteSource -> Maybe ByteString
 tmpxCheckStreams tars cmd    =  streamsMessage [tars', cmd']

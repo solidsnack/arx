@@ -48,8 +48,10 @@ TMPX
        unpacked the archives and set the environment.
 
        Any number of file path arguments may be specified; they will be inter‐
-       preted as tar archives to include in bundled script. If no archives are
-       specified, or - is given, then STDIN will be included.
+       preted  as  tar  archives  to include in bundled script. If - is given,
+       then STDIN will be included as an archive stream. If no  arguments  are
+       given,  it is assumed that no archives are desired and only the command
+       and environment are bundled.
 
        The temporary directory created by the script  is  different  for  each
        invocation,  with  a  name of the form /tmp/tmpx.<timestamp>.<pid>. The

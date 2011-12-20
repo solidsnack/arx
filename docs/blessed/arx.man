@@ -1,4 +1,4 @@
-.TH "ARX" "1" "2011-12-01" "0.0.4" "arx"
+.TH "ARX" "1" "2011-12-20" "0.1.0" "arx"
 .SH NAME
 arx \- archived execution
 .
@@ -88,8 +88,10 @@ command or executable in a temporary directory, after having unpacked the
 archives and set the environment.
 .sp
 Any number of file path arguments may be specified; they will be interpreted
-as tar archives to include in bundled script. If no archives are specified, or
-\fB\-\fP is given, then STDIN will be included.
+as tar archives to include in bundled script. If \fB\-\fP is given, then STDIN
+will be included as an archive stream. If no arguments are given, it is
+assumed that no archives are desired and only the command and environment are
+bundled.
 .sp
 The temporary directory created by the script is different for each
 invocation, with a name of the form \fB/tmp/tmpx.<timestamp>.<pid>\fP. The
