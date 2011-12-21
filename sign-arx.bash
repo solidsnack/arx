@@ -2,7 +2,7 @@
 set -o nounset -o errexit -o pipefail
 function usage {
 cat <<USAGE
- USAGE: signed-arch.bash <platform tag>?
+ USAGE: signed-arx.bash <platform tag>?
 
   Automatically determines GHC target architecture and platform tag. You may
   specify this if, for example, you want to indicate that the binary was only
