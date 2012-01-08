@@ -14,7 +14,10 @@ done
 if $tmp
 then
   dir=/tmp/tmpx.`date -u +%FT%TZ`.$$
-  rm -rf $dir
+  while [ -e "$dir" ]
+  do
+    dir="$dir".
+  done
   : ${rm_:=true}
   if $rm_
   then
