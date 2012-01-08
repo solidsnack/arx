@@ -21,14 +21,14 @@ then
   : ${rm_:=true}
   if $rm_
   then
-    trap "case \$?/$rm0/$rm1 in
-            0/true/*)      rm -rf $dir ;;
-            [1-9]*/*/true) rm -rf $dir ;;
-          esac" EXIT
-    trap "exit 2" HUP INT QUIT BUS SEGV PIPE TERM
+    trap 'case $?/$rm0/$rm1 in
+            0/true/*)      rm -rf "$dir" ;;
+            [1-9]*/*/true) rm -rf "$dir" ;;
+          esac' EXIT
+    trap 'exit 2' HUP INT QUIT BUS SEGV PIPE TERM
   fi
-  mkdir $dir
-  cd $dir
+  mkdir "$dir"
+  cd "$dir"
 fi
 go () {
   unpack_env > ./env
