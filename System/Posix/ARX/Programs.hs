@@ -56,7 +56,6 @@ instance ARX SHDAT LazyB.ByteString where
     or not to delete successful (exit code zero) runs; the second determines
     whether or not to delete failed (exit code non-zero) runs.
  -}
-
 data TMPX = TMPX SHDAT LazyB.ByteString -- Code of task to run.
                        [(Sh.Var, Sh.Val)] -- Environment mapping.
                        Bool -- Destroy tmp if task runs successfully.
