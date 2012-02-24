@@ -34,8 +34,8 @@ Dependencies
 The `arx` tool relies on the presence of `sed`, `tr`, `date`, `head`, `tar`,
 `hexdump` and `sh`. When unpacking tar archives, it may use the `-j` or `-z`
 (`bzip2` and `gzip`, respectively) options of `tar`. Scripts have been tested
-with `dash` and the GNU tools as well as the `sh` and tools that are part of
-`busybox`.
+with `dash` and the GNU tools as well as the `sh` implementation and userland
+tools that are part of `busybox`.
 
 Application
 -----------
