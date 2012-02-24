@@ -1,4 +1,4 @@
-.TH "ARX" "1" "2011-12-20" "0.1.0" "arx"
+.TH "ARX" "1" "2012-02-24" "0.1.0" "arx"
 .SH NAME
 arx \- archived execution
 .
@@ -42,20 +42,26 @@ arx tmpx <option,archive>* (//+ <command> (//+ <option,archive>*)?)?
 .fi
 .SH DESCRIPTION
 .sp
-The \fIarx\fP tool automates a common task in the world of operations automation:
-packing code, sending it to a remote machine, unpacking in a temporary
-directory, running a task therein and then removing the temporary directory.
-One might do this when setting up a moderately complicated back\-up script,
-installing a new version of nginx or even just to run jobs across ones
-infrastructure.
+A UNIX executable is a simple thing \-\- a file the kernel can execute, one way
+or another, via an interpreter or directly as object code. Every executable
+induces a family of executions \-\- instances of execution with different
+command line arguments, with different files in the working directory and with
+different environment variables present.
 .sp
-The \fIarx\fP tool has no in\-built notion of remote connections or server
-clusters; all automation is captured as Bourne compatible scripts that use a
-small number of UNIX utilities in a broadly portable way. At present, the
-utilities used are \fIsed\fP, \fItr\fP, \fIdate\fP, \fIhead\fP, and \fItar\fP. The calls to \fItar\fP
-sometimes use \fI\-j\fP and \fI\-z\fP; these calls to \fItar\fP may result in calls to
-\fIbzip2\fP and \fIgzip\fP. Scripts have been tested with \fIdash\fP and the GNU tools as
-well as the \fIsh\fP and tools that are part of \fIbusybox\fP.
+The \fIarx\fP tool captures the parameters of an execution and encodes them as an
+executable, making for easy, consistent transfer and repetition of a
+particular run. The generated executable ensures that each run occurs in a
+freshly allocated temporary directory, with only the desired files in scope;
+it uses traps to ensure the cleanup of this directory; and its format is a
+simple POSIX shell script, relying on just a few shell tools.
+.SH DEPENDENCIES
+.sp
+The \fIarx\fP tool relies on the presence of \fIsed\fP, \fItr\fP, \fIdate\fP, \fIhead\fP, \fItar\fP,
+\fIhexdump\fP and \fIsh\fP. When unpacking tar archives, it may use the \fI\-j\fP or \fI\-z\fP
+(\fIbzip2\fP and \fIgzip\fP, respectively) options of \fItar\fP. Scripts have been tested
+with \fIdash\fP and the GNU tools as well as the \fIsh\fP implementation and userland
+tools that are part of \fIbusybox\fP.
+.SH APPLICATION
 .sp
 The \fItmpx\fP subcommand of \fIarx\fP offers a variety of options for bundling code
 and a task to run. The \fIshdat\fP subcommand exposes the lower\-level
@@ -104,23 +110,19 @@ execution, the temporary directory is removed (or not, depending on the
 .INDENT 0.0
 .TP
 .B \fB\-rm0\fP, \fB\-rm1\fP, \fB\-rm_\fP, \fB\-rm!\fP
-.sp
 By default, the temporary directory created by the script will be deleted
 no matter the exit status status of the task. These options cause a script
 to be generated that deletes the temporary directory only on success, only
 on failure, always (the default) or never.
 .TP
 .B \fB\-b <size>\fP
-.sp
 Please see the documentation for this option, shared with \fIshdat\fP, below.
 .TP
 .B \fB\-o <path>\fP
-.sp
 By default, the generated script is sent to STDOUT. With \fB\-o\fP, output is
 redirected to the given path.
 .TP
 .B \fB\-e <path>\fP
-.sp
 Causes the file specified to be packaged as the task to be run. A binary
 executable, a Ruby script or a longish shell script all fit here.
 .UNINDENT
@@ -162,7 +164,6 @@ then STDIN will be read.
 .INDENT 0.0
 .TP
 .B \fB\-b <size>\fP
-.sp
 The size of data chunks to place in each HERE document. The argument is a
 positive integer followed by suffixes like \fBB\fP, \fBK\fP, \fBKiB\fP, \fBM\fP
 and \fBMiB\fP, in the manner of \fBdd\fP, \fBhead\fP and many other tools. The
@@ -170,7 +171,6 @@ default is 4MiB.  This is unlikely to make a difference for you unless the
 generated script is intended to be run on a memory\-constrained system.
 .TP
 .B \fB\-o <path>\fP
-.sp
 By default, the generated script is sent to STDOUT. With \fB\-o\fP, output is
 redirected to the given path.
 .UNINDENT
@@ -205,10 +205,8 @@ The command line parser offers no hints or help of any kind; it fails with the
 simple message "argument error". The two most common mistakes I make are:
 .INDENT 0.0
 .IP \(bu 2
-.
 Not qualifying paths with \fB/\fP, \fB./\fP or \fB../\fP.
 .IP \(bu 2
-.
 Not specifying a subcommand (\fItmpx\fP or \fIshdat\fP).
 .UNINDENT
 .SH AUTHOR
