@@ -15,20 +15,30 @@ Synopsis
 Description
 -----------
 
-The `arx` tool automates a common task in the world of operations automation:
-packing code, sending it to a remote machine, unpacking in a temporary
-directory, running a task therein and then removing the temporary directory.
-One might do this when setting up a moderately complicated back-up script,
-installing a new version of nginx or even just to run jobs across ones
-infrastructure.
+A UNIX executable is a simple thing -- a file the kernel can execute, one way
+or another, via an interpreter or directly as object code. Every executable
+induces a family of executions -- instances of execution with different
+command line arguments, with different files in the working directory and with
+different environment variables present.
 
-The `arx` tool has no in-built notion of remote connections or server
-clusters; all automation is captured as Bourne compatible scripts that use a
-small number of UNIX utilities in a broadly portable way. At present, the
-utilities used are `sed`, `tr`, `date`, `head`, and `tar`. The calls to `tar`
-sometimes use `-j` and `-z`; these calls to `tar` may result in calls to
-`bzip2` and `gzip`. Scripts have been tested with `dash` and the GNU tools as
-well as the `sh` and tools that are part of `busybox`.
+The `arx` tool captures the parameters of an execution and encodes them as an
+executable, making for easy, consistent transfer and repetition of a
+particular run. The generated executable ensures that each run occurs in a
+freshly allocated temporary directory, with only the desired files in scope;
+it uses traps to ensure the cleanup of this directory; and its format is a
+simple POSIX shell script, relying on just a few shell tools in the process.
+
+Dependencies
+------------
+
+The `arx` tool relies on the presence of `sed`, `tr`, `date`, `head`, `tar`,
+`hexdump` and `sh`. When unpacking tar archives, it may use the `-j` or `-z`
+(`bzip2` and `gzip`, respectively) options of `tar`. Scripts have been tested
+with `dash` and the GNU tools as well as the `sh` and tools that are part of
+`busybox`.
+
+Application
+-----------
 
 The `tmpx` subcommand of `arx` offers a variety of options for bundling code
 and a task to run. The `shdat` subcommand exposes the lower-level
