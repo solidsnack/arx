@@ -26,7 +26,7 @@ executable, making for easy, consistent transfer and repetition of a
 particular run. The generated executable ensures that each run occurs in a
 freshly allocated temporary directory, with only the desired files in scope;
 it uses traps to ensure the cleanup of this directory; and its format is a
-simple POSIX shell script, relying on just a few shell tools in the process.
+simple POSIX shell script, relying on just a few shell tools.
 
 Dependencies
 ------------
