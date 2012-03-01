@@ -13,11 +13,7 @@ do
 done
 if $tmp
 then
-  dir=/tmp/tmpx.`date -u +%FT%TZ`.$$
-  while [ -e "$dir" ]
-  do
-    dir="$dir".
-  done
+  dir=/tmp/tmpx-`hexdump -n8 -e '"%08x-%08x"' < /dev/urandom`
   : ${rm_:=true}
   if $rm_
   then
