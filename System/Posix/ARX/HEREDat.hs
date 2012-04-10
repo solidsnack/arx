@@ -25,10 +25,6 @@ import Numeric (showOct, showHex)
 import qualified Blaze.ByteString.Builder as Blaze
 import qualified Blaze.ByteString.Builder.Char8 as Blaze
 import qualified Data.ByteString.Nums.Careless as Bytes
-import Data.Vector.Unboxed (Vector)
-import qualified Data.Vector.Unboxed as Vector
-import qualified Data.Vector.Unboxed.Mutable as Vector
-import qualified Data.Vector.Algorithms.Intro as Vector
 
 import System.Posix.ARX.BlazeIsString
 
@@ -213,11 +209,8 @@ encoded (EncodedChunk _ _ _ _) = True
 
 {-|  
  -}
-script chunk                 =  mconcat $ case chunk of
-  SafeChunk bytes           ->  [clip len, dataSection eof bytes]
-   where
-    len                      =  Bytes.length bytes
-    eof                      =  blz (leastStringNotIn bytes)
+script block                 =  mconcat $ case block of
+  SafeChunk bytes           ->  [script (chunk bytes)] -- Convert to Encoded
   EncodedChunk bytes len
                (EscapeChar _ trN _ sedRN) (EscapeChar b _ sedPE sedRE) ->
     [ "{ ", mconcat tr, " | ", mconcat sed, " | ", clip len, " ;}",
@@ -232,54 +225,6 @@ script chunk                 =  mconcat $ case chunk of
   nl                         =  Blaze.fromChar '\n'
   dataSection eof bytes = mconcat [" <<\\", eof, nl, blz bytes, nl, eof, nl]
   clip len                   =  "head -c " `mappend` Blaze.fromShow len
-
-{-| Finds a short hexadecimal string that is not in the input.
-
-    A string of length @n@ has at most @n - (k - 1)@ substrings of some fixed,
-    positive length @k@ -- the substring starting at the first byte and
-    extending for @k@, the substring starting at the second byte and extending
-    for @k@ and so on, on until the end where we have to stop @k - 1@ short of
-    the last byte. We choose @k@ such that it contains enough hexadecimal
-    digits to enumerate all the substrings; for a 4M input, we want @k = 6@.
-
-    We can take all the hex substrings of length @k@ in the input, sort them,
-    and then find the gaps. We take the least substring in the first gap for
-    our chosen substring. This gives us an O(n log n) algorithm.
-
-    The measurable length of a 'ByteString' is at most the maximum 'Word'
-    (since the length function results in an 'Int'); this is one less than 2
-    to the bit width of a 'Word' (because there is a 0 'Word'). Thus a 'Word'
-    suffices to enumerate all the possible substrings in a 'ByteString'; and
-    one more. (Substrings are zero-indexed and the length is 1-indexed.) We
-    can leverage this fact to translate all substrings to 'Word' and store
-    them in an unboxed vector, using integer operations to find the least
-    subtring in the first gap. Space usage is linear in the length of the
-    input string; for a 4M string, the sorted vector could consume 32M on 64
-    bit machines.
- -}
-leastStringNotIn            ::  ByteString -> ByteString
-leastStringNotIn bytes       =  hex
- where
-  len                        =  Bytes.length bytes
-  digits                     =  1 + floor (logBase 16 (fromIntegral len))
-  substrings = [ s | s <- Bytes.take digits <$> Bytes.tails bytes, isHex s ]
-  sortedWords               ::  Vector Word
-  sortedWords                =  Vector.create $ do
-    v                       <-  Vector.new len
-    zipWithM_ (Vector.write v) [0..] (Bytes.hex <$> substrings)
-    Vector.sort v
-    return v
-  isHex ""                   =  False
-  isHex s                    =  Bytes.all (`Bytes.elem` "0123456789ABCDEF") s
-  -- Find the smallest number not in the list, assuming it is sorted.
-  minW                       =  f 0 (Vector.toList sortedWords)
-   where
-    f candidate l            =  case l of [ ]                 -> candidate
-                                          h:t | candidate < h -> candidate
-                                              | otherwise     -> f (h+1) t
-  padded                     =  "0000000000000000" `mappend`
-                                Data.ByteString.Char8.pack (showHex minW "")
-  (_, hex) = Bytes.splitAt (Bytes.length padded - digits) padded
 
 
  {- Catting a tarball escaped this way to a shell behind a TTY won't work very
