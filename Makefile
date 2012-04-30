@@ -3,8 +3,8 @@ arx: arx.hs
 	ghc -outputdir ./tmp --make -O2 ./arx.hs -o arx
 
 ./tmp/arx.ubuntu: arx.hs
-	ghc -outputdir ./tmp --make -O2 ./arx.hs -no-link
-	./ubuntu/link.sh ./tmp/arx.ubuntu
+	./ubuntu/compile-and-gen-linker-line.bash > ./ubuntu/linker-line
+	sh ./ubuntu/linker-line
 	strip ./tmp/arx.ubuntu
 
 doc:
