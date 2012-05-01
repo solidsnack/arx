@@ -2,14 +2,20 @@
 set -o nounset -o errexit -o pipefail
 function usage {
 cat <<USAGE
- USAGE: signed-arx.bash <platform tag>?
+ USAGE: signed-arx.bash mk <platform tag>?
+ USAGE: signed-arx.bash sign_and_sum <file> <platform> <version>
 
-  Automatically determines GHC target architecture and platform tag. You may
-  specify this if, for example, you want to indicate that the binary was only
-  tested on Ubuntu or Leopard.
+  In the first form, automatically determines GHC target architecture and
+  platform tag and builds and signs arx. You may specify the platform tag if,
+  for example, you want to indicate that the binary is only intended for
+  Leopard or Ubuntu.
+
+  In the second form, simply signs and archives the given file (for example,
+  /tmp/arx) with version and platform as specified. Used to sign a binary on a
+  machine other than the one it was built on (for example).
 
 USAGE
-}
+};function -h { usage ;};function --help { usage ;};function help { usage ;}
 
 declare -a sedRE
 if sed --version &>/dev/null
@@ -67,32 +73,28 @@ function sign_and_sum {
   ( cd "$d" && tar cjf "$v".tbz "$v" )
 }
 
-mk=true
-declare -a sign_args=('./tmp/arx')
-while [[ $# != 0 ]]
-do
-  case "$1" in
-    -h|-'?'|--help) usage ; exit ;;
-    --debug-mode) "$@" ;;
-    --no-mk) mk=false ;;
-    *) case "${#sign_args[@]}" in
-         1) sign_args[1]="$1" ;;
-         *) echo 'Bad args.' ; exit 2 ;;
-       esac ;;
+function mk {
+  local sign_args=('./tmp/arx')
+  while [[ $# != 0 ]]
+  do
+    case "$1" in
+      *) case "${#sign_args[@]}" in
+           1) sign_args[1]="$1" ;;
+           *) echo 'Bad arguments.' >&2 ; exit 2 ;;
+         esac ;;
+    esac
+    shift
+  done
+  local target=( $(ghc_target) )
+  case "${#sign_args[@]}" in
+    1) sign_args[1]="${target[0]}"-"${target[1]}" ;;
+    2) sign_args[1]="${target[0]}"-"${sign_args[1]}" ;;
+    *) echo 'Bad arguments.' >&2 ; exit 2 ;;
   esac
-  shift
-done
-declare -a target=( $(ghc_target) )
-case "${#sign_args[@]}" in
-  1) sign_args[1]="${target[0]}"-"${target[1]}" ;;
-  2) sign_args[1]="${target[0]}"-"${sign_args[1]}" ;;
-  *) echo 'Bad arguments.' ; exit 2 ;;
-esac
-
-if $mk
-then
   echo 'Building stripped binary...' >&2
   mk_arx
-fi
-sign_and_sum "${sign_args[@]}" "$(version)"
+  sign_and_sum "${sign_args[@]}" "$(version)"
+}
+
+"$@"
 
