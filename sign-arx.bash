@@ -43,8 +43,8 @@ function ghc_target {
 
 function mk_arx {
   local target=''
-  { { uname -a | fgrep -q Ubuntu ;} && target=./tmp/arx.ubuntu ;} ||
-  { { uname -a | fgrep -q Darwin ;} && target=./tmp/arx.osx ;} ||
+  { { uname -a | fgrep -q Ubuntu ;} && target=tmp/arx.ubuntu ;} ||
+  { { uname -a | fgrep -q Darwin ;} && target=tmp/arx.osx ;} ||
   { echo 'Unknown target...' >&2 ; exit 4 ;}
   if ! make "$target" >&/dev/null
   then

@@ -1,0 +1,26 @@
+#!/bin/bash
+set -o errexit -o nounset -o pipefail
+
+# Use LDD to find the shared libraries referenced by this executable.
+function shareds {
+  ldd "$1" | sed -nr '/^\t[^ ]+[.][0-9]+ => ([^ ]+)( .+)?$/ { s//\1/ ; p }'
+}
+
+# Use dpkg to associate each shared .so with a .deb.
+function debs {
+  shareds "$1" | xargs dpkg -S | sort
+}
+
+# Use the list of debs to weed out libraries in the libc package and then
+# search for static libraries that match the dynamic libs. 
+function statics {
+  debs "$1" | egrep -v libc[0-9]+ | cut -d' ' -f2 |
+  sed -nr '/^.+[/]([^/]+)[.]so([.][0-9.]+)?$/ { s//\1.a/ ; p }' |
+  while read lib
+  do
+    find /usr/lib /lib -name "$lib" | head -n1
+  done
+}
+
+"$@"
+

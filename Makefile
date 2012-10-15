@@ -1,21 +1,30 @@
+.PHONY: doc clean ubuntu-build-deps
 
-arx: arx.hs
+arx: arx.hs doc
 	ghc -outputdir ./tmp --make -O2 ./arx.hs -o arx
 
-./tmp/arx.ubuntu: arx.hs
-	./ubuntu/compile-and-gen-linker-line.bash > ./ubuntu/linker-line
-	sh ./ubuntu/linker-line
-	strip ./tmp/arx.ubuntu
+tmp/arx.ubuntu: libs = $(shell ubuntu/so2a4hs statics arx)
+tmp/arx.ubuntu: arx ubuntu/so2a4hs
+	ghc -outputdir ./tmp --make -O2 arx.hs -o $@ \
+	 -optl-Wl,--whole-archive \
+	  $(libs:%=-optl%) \
+	 -optl-Wl,--no-whole-archive
+	strip $@
 
 doc:
 	cd ./docs && make blessed
 
 clean:
-	rm -rf ./tmp ./arx
+	rm -rf tmp arx dist/build
+
+ubuntu-build-deps:
+	env DEBIAN_FRONTEND=noninteractive aptitude install -y \
+	  python-sphinx cabal-install
+	cabal install --only-dependencies
 
 dist/build/arx/arx: cabal
 
-./tmp/arx.osx: dist/build/arx/arx
+tmp/arx.osx: dist/build/arx/arx
 	mkdir -p ./tmp
 	cp ./dist/build/arx/arx ./tmp/arx.osx
 	strip ./tmp/arx.osx
