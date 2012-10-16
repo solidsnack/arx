@@ -1,0 +1,22 @@
+#!/bin/bash
+set -o nounset -o errexit -o pipefail
+function usage {
+cat <<USAGE
+ USAGE: netbuild <server>
+
+  Uses ARX to send the source to a server, build it and retrieve the build.
+
+USAGE
+};function -h { usage ;};function --help { usage ;};function help { usage ;}
+
+function source_archive {
+  tar -c --exclude tmp --exclude .git --exclude dist/* .
+}
+
+function netbuild {
+  arx tmpx <(source_archive) // make '>&2' '&&' tar -c tmp/dist |
+  ssh "$1" sh | tar -xv
+}
+
+netbuild "$@"
+

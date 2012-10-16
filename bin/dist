@@ -1,0 +1,47 @@
+#!/bin/bash
+set -o nounset -o errexit -o pipefail
+function usage {
+cat <<USAGE
+ USAGE: dist tag
+
+  Utilities for binary builds.
+
+USAGE
+};function -h { usage ;};function --help { usage ;};function help { usage ;}
+
+esed=()
+function esed {
+  if [[ ${#esed[@]} -eq 0 ]]
+  then
+    sed --version &>/dev/null && esed=(sed -r) || esed=(sed -E)
+  fi
+  "${esed[@]}" "$@"
+}
+
+function cabal_version {
+  esed -n '/^version *: *([^ ]+) *$/ { s//\1/ ; p ;}' ./arx.cabal
+}
+
+function ghc_target {
+  ghc --info | fgrep 'Target platform' | cut -d'"' -f4
+}
+
+function custom_target {
+  local target="$(ghc_target | sed s/x86_64/amd64/)"
+  case "$(uname -a)" in
+    *Ubuntu*) target="${target%%-*}"-ubuntu ;;
+    *Darwin*) target="${target%%-*}"-osx ;;
+  esac
+  out "$target"
+}
+
+function tag {
+  out "$(cabal_version)-$(custom_target)"
+}
+
+function msg { out "$*" 1>&2 ;}
+function err { local x=$? ; msg "$*" ; return $(( $x == 0 ? 1 : $x )) ;}
+function out { printf '%s\n' "$*" ;}
+
+"$@"
+
