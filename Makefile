@@ -1,6 +1,11 @@
-.PHONY: doc clean cabal ubuntu-build-deps
+.PHONY: doc clean cabal ubuntu-build-deps tarballs
+
+# Prevents the .sha files from being deleted. Not sure what the story is.
+.SECONDARY:
 
 tag = arx-$(shell ./bin/dist tag)
+built = $(wildcard tmp/dist/*/arx)
+tarballs = $(built:%/arx=%.tbz)
 
 ifeq (Darwin,$(shell uname))
   tagged = tmp/arx.cabal
@@ -20,11 +25,11 @@ tmp/dist/%/arx.gpg: tmp/dist/%/arx
 tmp/dist/%/arx.sha: tmp/dist/%/arx
 	shasum --portable --algorithm 512 $< > $@
 
-tarballs: $($(wildcard tmp/dist/*/arx):%/arx=%.tbz)
+tarballs: $(tarballs)
 
 tmp/dist/%.tbz: d = $(@:tmp/dist/%.tbz=%)
 tmp/dist/%.tbz: tmp/dist/%/arx tmp/dist/%/arx.gpg tmp/dist/%/arx.sha
-	tar cjf $d.tbz -C tmp/dist $d
+	tar cjf $@ -C tmp/dist $d
 
 
 arx: arx.hs doc
@@ -51,7 +56,8 @@ tmp/arx.cabal: dist/build/arx/arx
 dist/build/arx/arx: cabal
 
 cabal:
-	cabal configure --disable-executable-profiling --disable-library-profiling
+	cabal configure --disable-executable-profiling \
+	                --disable-library-profiling
 	cabal build
 
 doc:
