@@ -39,91 +39,101 @@ APPLICATION
 
        arx tmpx ... | ssh user@host.com sudo sh
 
-       For  all subcommands, when options overlap in their effect -- for exam-
-       ple, setting the output with -o -- the rightmost  option  takes  prece-
-       dence.   Whenever -h, -? or --help is present on the command line, help
+       Scripts  generated  by  tmpx will pass their arguments to the contained
+       script or command. To pass arguments when piping to sh, use -s:
+
+       arx tmpx ... | ssh user@host.com sudo sh -s a b c
+
+       Some arguments to the  generated  script  will  be  treated  specially,
+       namely,  --extract,  --no-rm  and  --no-run.  Please see the section on
+       Passing Arguments, below, for more information about these options.
+
+ARX COMMANDLINE PROCESSING
+       For all subcommands, when options overlap in their effect -- for  exam-
+       ple,  setting  the  output with -o -- the rightmost option takes prece-
+       dence.  Whenever -h, -? or --help is present on the command line,  help
        is displayed and the program exits.
 
-       When paths are specified on an arx command line, they  must  be  quali-
+       When  paths  are  specified on an arx command line, they must be quali-
        fied, starting with /, ./ or ../. This simplifies the command line syn-
        tax, overall, without introducing troublesome ambiguities.
 
 TMPX
        The tmpx subcommand bundles together archives, environment settings and
-       an  executable  or  shell command in to a Bourne-compatible script that
-       runs the command or executable in a temporary directory,  after  having
+       an executable or shell command in to a  Bourne-compatible  script  that
+       runs  the  command or executable in a temporary directory, after having
        unpacked the archives and set the environment.
 
        Any number of file path arguments may be specified; they will be inter-
-       preted as tar archives to include in bundled script.  If  -  is  given,
-       then  STDIN  will be included as an archive stream. If no arguments are
-       given, it is assumed that no archives are desired and only the  command
+       preted  as  tar  archives  to include in bundled script. If - is given,
+       then STDIN will be included as an archive stream. If no  arguments  are
+       given,  it is assumed that no archives are desired and only the command
        and environment are bundled.
 
-       The  temporary  directory  created  by the script is different for each
-       invocation, with a name of the  form  /tmp/tmpx.<timestamp>.<pid>.  The
-       timestamp  used  is  a UTC, ISO 8601 format timestamp. One happy conse-
-       quence of this is that earlier jobs sort  ASCIIbetically  before  later
-       jobs.  After  execution,  the  temporary  directory is removed (or not,
+       The temporary directory created by the script  is  different  for  each
+       invocation,  with a name of the form /tmp/tmpx-<timestamp>-<randomhex>.
+       The timestamp format is %Y.%m.%dT%H.%M.%SZ, in UTC.  One  happy  conse-
+       quence  of  this  is that earlier jobs sort ASCIIbetically before later
+       jobs. After execution, the temporary  directory  is  removed  (or  not,
        depending on the -rm[10!_] family of options).
 
           -rm0, -rm1, -rm_, -rm!
-                 By default, the temporary directory  created  by  the  script
+                 By  default,  the  temporary  directory created by the script
                  will be deleted no matter the exit status status of the task.
                  These options cause a script to be generated that deletes the
-                 temporary  directory only on success, only on failure, always
+                 temporary directory only on success, only on failure,  always
                  (the default) or never.
 
           -b <size>
-                 Please see the documentation for  this  option,  shared  with
+                 Please  see  the  documentation  for this option, shared with
                  shdat, below.
 
           -o <path>
-                 By  default, the generated script is sent to STDOUT. With -o,
+                 By default, the generated script is sent to STDOUT. With  -o,
                  output is redirected to the given path.
 
           -e <path>
-                 Causes the file specified to be packaged as the  task  to  be
-                 run.  A  binary  executable, a Ruby script or a longish shell
+                 Causes  the  file  specified to be packaged as the task to be
+                 run. A binary executable, a Ruby script or  a  longish  shell
                  script all fit here.
 
-       In addition to these options, arguments of the form VAR=VALUE are  rec-
-       ognized  as  environment  mappings and stored away in the script, to be
+       In  addition to these options, arguments of the form VAR=VALUE are rec-
+       ognized as environment mappings and stored away in the  script,  to  be
        sourced on execution.
 
-       Without -e, the tmpx subcommand tries to find the task to be run  as  a
-       sequence  of  arguments  delimited  by  a run of slashes. The following
+       Without  -e,  the tmpx subcommand tries to find the task to be run as a
+       sequence of arguments delimited by a  run  of  slashes.  The  following
        forms are all recognized:
 
        arx tmpx  ...some args... // ...command...
        arx tmpx  ...some args... // ...command... // ...more args...
        arx tmpx // ...command... // ...some args...
 
-       The slash runs must have the same number of slashes  and  must  be  the
-       longest  continuous  runs  of  slashes on the command line. The command
-       will be included as is in a Bourne shell script.
+       The  slash  runs  must  have the same number of slashes and must be the
+       longest continuous runs of slashes on the  command  line.  The  command
+       will be included as-is in a Bourne shell script.
 
 SHDAT
-       The shdat subcommand translates binary data in to a shell script  which
-       outputs  the binary data. The data is encoded in HERE documents in such
-       a way that data without NULs is not changed and that data with NULs  is
-       minimally  expanded:  about  1% for randomish data like compressed tar-
+       The  shdat subcommand translates binary data in to a shell script which
+       outputs the binary data. The data is encoded in HERE documents in  such
+       a  way that data without NULs is not changed and that data with NULs is
+       minimally expanded: about 1% for randomish data  like  compressed  tar-
        balls and about 10% in pathological cases.
 
-       The shdat subcommand can be given any number of paths,  which  will  be
+       The  shdat  subcommand  can be given any number of paths, which will be
        concatenated in the order given. If no path is given, or if - is given,
        then STDIN will be read.
 
           -b <size>
-                 The size of data chunks to place in each HERE  document.  The
-                 argument  is  a positive integer followed by suffixes like B,
-                 K, KiB, M and MiB, in the manner of dd, head and  many  other
-                 tools.  The default is 4MiB.  This is unlikely to make a dif-
+                 The  size  of data chunks to place in each HERE document. The
+                 argument is a positive integer followed by suffixes  like  B,
+                 K,  KiB,  M and MiB, in the manner of dd, head and many other
+                 tools. The default is 4MiB.  This is unlikely to make a  dif-
                  ference for you unless the generated script is intended to be
                  run on a memory-constrained system.
 
           -o <path>
-                 By  default, the generated script is sent to STDOUT. With -o,
+                 By default, the generated script is sent to STDOUT. With  -o,
                  output is redirected to the given path.
 
 EXAMPLES
@@ -145,9 +155,41 @@ EXAMPLES
        arx tmpx // 'cd arx-* && cabal configure && cabal build' // \
                 -rm0 ./dist/arx-0.0.0.tar.gz | sh
 
+PASSING ARGUMENTS TO GENERATED SCRIPTS
+       The scripts generated by tmpx treat some arguments as special, internal
+       options, to allow for inspecting them should there be a need to  deter-
+       mine their contents.
+
+          --extract
+                 Unpack the data in the present directory and do nothing else.
+
+          --no-rm
+                 Run the script as normal but do not delete the generated tem-
+                 porary directory.
+
+          --no-run
+                 Unpack  into  a  temporary directory as normal but do not run
+                 the user's command.
+
+       To prevent arguments from being specially treated, use // in the  argu-
+       ment list:
+
+       a-tmpx-script.sh --no-rm // a b c --extract
+
+       In the above example, --extract will be passed to the inner command, in
+       the same way as a, b, c. The following example causes ab, c and --no-rm
+       to be printed one after another, each on their own line.
+
+       arx tmpx // printf "'%s\n'" '"$@"' | sh -s // ab c --no-rm
+
+NOTES
+       The  timestamp  is  not the common ISO 8601 format, %Y-%m-%dT%H:%M:%SZ,
+       because of software and build processes that attach special meaning  to
+       colons in pathnames.
+
 BUGS
-       The command line parser offers no hints or help of any kind;  it  fails
-       with  the simple message "argument error". The two most common mistakes
+       The  command  line parser offers no hints or help of any kind; it fails
+       with the simple message "argument error". The two most common  mistakes
        I make are:
 
        o Not qualifying paths with /, ./ or ../.
