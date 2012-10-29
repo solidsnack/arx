@@ -36,8 +36,8 @@ tmp/dist/%.tbz: tmp/dist/%/arx tmp/dist/%/arx.gpg tmp/dist/%/arx.sha
 arx: arx.hs doc
 	ghc -outputdir tmp --make -O2 arx.hs -o arx
 
-tmp/arx.custom: libs = $(shell dist/so2a4hs statics arx)
-tmp/arx.custom: arx dist/so2a4hs
+tmp/arx.custom: libs = $(shell bin/so2a4hs statics arx)
+tmp/arx.custom: arx bin/so2a4hs
 	ghc -outputdir tmp --make -O2 arx.hs -o $@ \
 	 -optl-Wl,--whole-archive \
 	  $(libs:%=-optl%) \
