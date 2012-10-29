@@ -29,13 +29,13 @@ opts() {
   while [ "$i" -lt "$n" ]
   do
     arg="$1" ; shift
-    set -- "$@" "$arg" ;;
+    set -- "$@" "$arg"
     i=$(($i+1))
   done
   # Set the trap.
   if $tmp
   then
-    dir=/tmp/arx-"$token"
+    dir=/tmp/tmpx-"$token"
     : ${rm_:=true}
     if $rm_
     then
@@ -59,7 +59,7 @@ go () {
   unpack_dat
   if $run
   then
-    ( . ../env && ../run )
+    ( . ../env && ../run "$@" )
   fi
 }
 unpack_env () { : # NOOP
