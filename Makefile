@@ -22,8 +22,9 @@ tmp/dist/$(tag)/arx: $(tagged)
 tmp/dist/%/arx.gpg: tmp/dist/%/arx
 	gpg --use-agent --detach-sign $<
 
+tmp/dist/%/arx.sha: d = $(@:%/arx.sha=%)
 tmp/dist/%/arx.sha: tmp/dist/%/arx
-	shasum --portable --algorithm 512 $< > $@
+	( cd $d && shasum --portable --algorithm 512 arx > arx.sha )
 
 tarballs: $(tarballs)
 
