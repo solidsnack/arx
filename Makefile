@@ -3,6 +3,7 @@
 # Prevents the .sha files from being deleted. Not sure what the story is.
 .SECONDARY:
 
+v = $(shell git describe || bin/dist cabal_version || echo '(unversioned)')
 tag = arx-$(shell ./bin/dist tag)
 built = $(wildcard tmp/dist/*/arx)
 tarballs = $(built:%/arx=%.tbz)
@@ -14,6 +15,9 @@ else
 endif
 
 this_platform: tmp/dist/$(tag)/arx
+
+version:
+	echo $v > $@
 
 tmp/dist/$(tag)/arx: $(tagged)
 	mkdir -p tmp/dist/$(tag)
@@ -32,8 +36,7 @@ tmp/dist/%.tbz: d = $(@:tmp/dist/%.tbz=%)
 tmp/dist/%.tbz: tmp/dist/%/arx tmp/dist/%/arx.gpg tmp/dist/%/arx.sha
 	tar cjf $@ -C tmp/dist $d
 
-
-arx: arx.hs doc
+arx: version arx.hs doc
 	ghc -outputdir tmp --make -O2 arx.hs -o arx
 
 tmp/arx.custom: libs = $(shell bin/so2a4hs statics arx)
@@ -56,7 +59,7 @@ tmp/arx.cabal: dist/build/arx/arx
 
 dist/build/arx/arx: cabal
 
-cabal:
+cabal: version
 	cabal configure --disable-executable-profiling \
 	                --disable-library-profiling
 	cabal build

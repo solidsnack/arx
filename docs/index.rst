@@ -7,7 +7,8 @@ Synopsis
 
 .. code-block:: text
 
-    arx ... (-h|-[?]|--help)? ...
+    arx (-h | -[?] | --help)
+    arx (-v | --version)
     arx shdat (-b <size>)? (-o <output file>)? < input
     arx shdat (-b <size>)? (-o <output file>)? <input file>+
     arx tmpx <option,archive>* (//+ <command> (//+ <option,archive>*)?)?

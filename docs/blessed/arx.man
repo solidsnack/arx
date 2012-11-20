@@ -1,4 +1,4 @@
-.TH "ARX" "1" "2012-10-29" "0.2.0" "arx"
+.TH "ARX" "1" "2012-11-20" "0.2.0" "arx"
 .SH NAME
 arx \- archived execution
 .
@@ -34,7 +34,8 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .sp
 .nf
 .ft C
-arx ... (\-h|\-[?]|\-\-help)? ...
+arx (\-h | \-[?] | \-\-help)
+arx (\-v | \-\-version)
 arx shdat (\-b <size>)? (\-o <output file>)? < input
 arx shdat (\-b <size>)? (\-o <output file>)? <input file>+
 arx tmpx <option,archive>* (//+ <command> (//+ <option,archive>*)?)?

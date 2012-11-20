@@ -16,16 +16,16 @@ import qualified System.Posix.ARX.CLI
 
 main                        ::  IO ()
 main                         =  do
-  helpFlag                  <-  checkHelp
-  if helpFlag then sendHelp
-              else System.Posix.ARX.CLI.main
+  flags                     <-  (,) <$> checkHelp <*> checkVersion
+  case flags of (True, _)   ->  Data.ByteString.putStr usage >> exitSuccess
+                (_, True)   ->  Data.ByteString.putStr version >> exitSuccess
+                (_,    _)   ->  System.Posix.ARX.CLI.main
 
 
-checkHelp = any (`elem` ["-h", "-?", "--help"]) <$> getArgs
+checkHelp                    =  checkOne ["-h", "-?", "--help"]
+checkVersion                 =  checkOne ["-v", "--version"]
+checkOne list                =  any (`elem` list) . take 1 <$> getArgs
 
-
-txt                          =  $(embedFile "./docs/blessed/arx.txt")
-
-sendHelp                     =  do Data.ByteString.putStr txt
-                                   exitSuccess
+usage                        =  $(embedFile "./docs/blessed/arx.txt")
+version                      =  $(embedFile "./version")
 
