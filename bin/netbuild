@@ -18,5 +18,10 @@ function netbuild {
   ssh "$1" sh | tar -xv
 }
 
-netbuild "$@"
+if fgrep -q -- "$(declare -F | cut -d' ' -f3-)" <<<"$1"
+then
+  "$@"
+else
+  netbuild "$@"
+fi
 
