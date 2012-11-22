@@ -19,7 +19,7 @@ function esed {
 }
 
 function cabal_version {
-  esed -n '/^version *: *([^ ]+) *$/ { s//\1/ ; p ;}' ./arx.cabal
+  esed -n '/^version *: *([^ ]+) *$/ { s//\1/ ; p ;}' *.cabal | head -n1
 }
 
 function ghc_target {
