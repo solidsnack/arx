@@ -26,8 +26,6 @@ import qualified Blaze.ByteString.Builder as Blaze
 import qualified Blaze.ByteString.Builder.Char8 as Blaze
 import qualified Data.ByteString.Nums.Careless as Bytes
 
-import System.Posix.ARX.BlazeIsString
-
 
 {-| A chunk describes a block of binary data ready for inclusion in a shell
     script. For many data blocks, no encoding or decoding is necessary; these

@@ -16,7 +16,6 @@ import Data.Word
 
 import qualified Blaze.ByteString.Builder as Blaze
 
-import System.Posix.ARX.BlazeIsString -- Most string literals are builders.
 import System.Posix.ARX.HEREDat
 import qualified System.Posix.ARX.Sh as Sh
 import qualified System.Posix.ARX.TMPXTools as TMPXTools
