@@ -16,7 +16,7 @@ import Data.Ord
 import Data.Word
 import Text.Parsec hiding (satisfy, (<|>))
 
-import qualified Data.Attoparsec
+import qualified Data.Attoparsec.ByteString as Attoparsec
 
 import System.Posix.ARX.CLI.CLTokens (Class(..))
 import qualified System.Posix.ARX.CLI.CLTokens as CLTokens
@@ -145,9 +145,9 @@ argPrim                      =  tokenPrim show next
  where
   next pos _ _               =  incSourceLine pos 1
 
-(<@>) :: Data.Attoparsec.Parser t -> ArgsParser ByteString -> ArgsParser t
+(<@>) :: Attoparsec.Parser t -> ArgsParser ByteString -> ArgsParser t
 atto <@> parsec              =  do
-  res                       <-  Data.Attoparsec.parseOnly atto <$> parsec
+  res                       <-  Attoparsec.parseOnly atto <$> parsec
   case res of Left _        ->  mzero
               Right x       ->  return x
 infixl 4 <@>

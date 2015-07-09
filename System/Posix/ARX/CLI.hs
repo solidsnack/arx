@@ -17,7 +17,7 @@ import Data.Monoid
 import Data.Ord
 import Data.Word
 import System.Environment
-import System.Exit
+import System.Exit (exitFailure)
 import System.IO
 
 import qualified Blaze.ByteString.Builder as Blaze

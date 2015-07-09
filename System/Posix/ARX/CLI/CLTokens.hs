@@ -16,9 +16,10 @@ import Data.Either
 import Data.Map (Map)
 import qualified Data.Map as Map
 
-import Data.Attoparsec.Char8 ( char8, choice, decimal, endOfInput, inClass,
-                               isDigit, parseOnly, Parser, satisfy, string,
-                               takeWhile, takeWhile1, try )
+import Data.Attoparsec.ByteString.Char8 ( char8, choice, decimal, endOfInput,
+                                          inClass, isDigit, parseOnly, Parser,
+                                          satisfy, string, takeWhile,
+                                          takeWhile1, try )
 
 
 {-| Non-overlapping classes of command line argument strings.
