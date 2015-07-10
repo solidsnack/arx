@@ -14,8 +14,6 @@ import Data.Monoid
 import qualified Blaze.ByteString.Builder as Blaze
 import Data.FileEmbed
 
-import System.Posix.ARX.BlazeIsString
-
 
 data Template = Template { rm0 :: Bool, {-^ Remove tmp on run success?    -}
                            rm1 :: Bool, {-^ Remove tmp on run error?      -}

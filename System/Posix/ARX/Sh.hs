@@ -14,8 +14,6 @@ import Data.Monoid
 import qualified Blaze.ByteString.Builder as Blaze
 import qualified Text.ShellEscape as Esc
 
-import System.Posix.ARX.BlazeIsString
-
 
 setEU                       ::  Blaze.Builder
 setEU                        =  "set -e -u\n"
