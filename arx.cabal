@@ -1,5 +1,5 @@
 name                          : arx
-version                       : 0.2.0
+version                       : 0.2.2
 category                      : Text
 license                       : BSD3
 license-file                  : LICENSE
@@ -53,7 +53,7 @@ extra-source-files            : README
                               , docs/blessed/arx.man
                               , docs/blessed/arx.txt
                               , model-scripts/tmpx.sh
-                              , System/Posix/ARX/BlazeIsString.hs
+                              , version
 
 source-repository               head
   type                        : git
