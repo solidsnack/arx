@@ -2,8 +2,7 @@
 set -e -u
 unset rm_ dir
 tmp=true ; run=true
-rm0=true ; rm1=true # To be set by tool.
-token=`date -u +%FT%TZ | tr :- ..`-`hexdump -n4 -e '"%08x"' </dev/urandom`
+rm0=true ; rm1=true ; hash="" # To be set by tool.
 opts() {
   cmd="$1" ; shift
   n=$#
@@ -32,10 +31,14 @@ opts() {
     set -- "$@" "$arg"
     i=$(($i+1))
   done
+  # Call the command with the reassembled ARGV, options removed.
+  "$cmd" "$@"
+}
+go () {
   # Set the trap.
   if $tmp
   then
-    dir=/tmp/tmpx-"$token"
+    dir=/tmp/tmpx-"$hash"
     : ${rm_:=true}
     if $rm_
     then
@@ -45,13 +48,15 @@ opts() {
             esac' EXIT
       trap 'exit 2' HUP INT QUIT BUS SEGV PIPE TERM
     fi
+    if [ -d "$dir/dat" ] && [ -f "$dir/env" ] && [ -f "$dir/run" ] && $run
+    then
+        cd "$dir/dat"
+        ( . ../env && ../run "$@" )
+        return
+    fi
     mkdir "$dir"
     cd "$dir"
   fi
-  # Call the command with the reassembled ARGV, options removed.
-  "$cmd" "$@"
-}
-go () {
   unpack_env > ./env
   unpack_run > ./run ; chmod ug+x ./run
   mkdir dat

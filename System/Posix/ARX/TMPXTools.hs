@@ -14,6 +14,9 @@ import Data.Monoid
 import qualified Blaze.ByteString.Builder as Blaze
 import Data.FileEmbed
 
+import Data.Hashable (hash)
+import Numeric (showIntAtBase)
+import Data.Char (intToDigit)
 
 data Template = Template { rm0 :: Bool, {-^ Remove tmp on run success?    -}
                            rm1 :: Bool, {-^ Remove tmp on run error?      -}
@@ -29,7 +32,7 @@ instance Show Template where
 
 render                      ::  Template -> Blaze.Builder
 render Template{..}          =  mconcat [ blaze a,
-                                          flags, 
+                                          flags,
                                           blaze b,
                                           env,
                                           blaze c,
@@ -38,7 +41,10 @@ render Template{..}          =  mconcat [ blaze a,
                                           dat,
                                           blaze e ]
  where
-  flags                      =  mconcat ["rm0=",tf rm0," ; ","rm1=",tf rm1,"\n"]
+  flags                      =  mconcat [ "rm0=", tf rm0, " ; ",
+                                          "rm1=", tf rm1, " ; ",
+                                          "hash=", hash' dat, "\n"]
+  hash'                      =  blaze . Bytes.pack . (\x -> showIntAtBase 16 intToDigit x "") . abs . hash . Blaze.toByteString
   blaze                      =  Blaze.fromByteString
   tf True                    =  "true"
   tf False                   =  "false"
