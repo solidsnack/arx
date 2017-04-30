@@ -43,11 +43,11 @@ main                         =  do
       let apply i            =  interpret (SHDAT size) <$> inIOStream i
       mapM_ ((send out =<<) . apply) ins
     Right (Right tmpxArgs)  ->  do
-      let (size, out, tars, env, (rm0, rm1), cmd) = tmpxResolve tmpxArgs
+      let (size, out, tars, env, (rm0, rm1, rm2), cmd) = tmpxResolve tmpxArgs
       case tmpxCheckStreams tars cmd of Nothing  -> return ()
                                         Just msg -> do die msg
       cmd'                  <-  openByteSource cmd
-      let tmpx               =  TMPX (SHDAT size) cmd' env rm0 rm1
+      let tmpx               =  TMPX (SHDAT size) cmd' env rm0 rm1 rm2
       (badAr, goodAr)       <-  partitionEithers <$> mapM openArchive tars
       (badAr /= []) `when` do (((die .) .) . blockMessage)
                                 "The file magic of some archives:"
@@ -86,15 +86,15 @@ shdatCheckStreams ins        =  streamsMessage [ins']
 {-| Apply defaulting and overrides appropriate to 'TMPX' programs.
  -}
 tmpxResolve                 ::  ( [Word], [IOStream], [IOStream],
-                                  [(Var, Val)], [(Bool, Bool)], [ByteSource] )
+                                  [(Var, Val)], [(Bool, Bool, Bool)], [ByteSource] )
                             ->  ( Word, IOStream, [IOStream],
-                                  [(Var, Val)], (Bool, Bool), ByteSource )
+                                  [(Var, Val)], (Bool, Bool, Bool), ByteSource )
 tmpxResolve (sizes, outs, tars, env, rms, cmds) =
   (size, out, tars, env, rm, cmd)
  where
   size                       =  last (defaultBlock:sizes)
   out                        =  last (STDIO:outs)
-  rm                         =  last ((True,True):rms)
+  rm                         =  last ((True,True,False):rms)
   cmd                        =  last (defaultTask:cmds)
 
 tmpxCheckStreams            ::  [IOStream] -> ByteSource -> Maybe ByteString
@@ -108,13 +108,13 @@ tmpxCheckStreams tars cmd    =  streamsMessage [tars', cmd']
     | cmd == IOStream STDIO  =  One "as a command input"
     | otherwise              =  Zero
 
-tmpxOpen :: Word -> [(Var, Val)] -> (Bool, Bool) -> ByteSource -> IO TMPX
-tmpxOpen size env (rm0, rm1) cmd = do
+tmpxOpen :: Word -> [(Var, Val)] -> (Bool, Bool, Bool) -> ByteSource -> IO TMPX
+tmpxOpen size env (rm0, rm1, rm2) cmd = do
   text                      <-  case cmd of
     ByteString b            ->  return (LazyB.fromChunks [b])
     IOStream STDIO          ->  LazyB.getContents
     IOStream (Path b)       ->  LazyB.readFile (Char8.unpack b)
-  return (TMPX (SHDAT size) text env rm0 rm1)
+  return (TMPX (SHDAT size) text env rm0 rm1 rm2)
 
 
 openByteSource              ::  ByteSource -> IO LazyB.ByteString

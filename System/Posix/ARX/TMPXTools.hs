@@ -43,8 +43,10 @@ render Template{..}          =  mconcat [ blaze a,
  where
   flags                      =  mconcat [ "rm0=", tf rm0, " ; ",
                                           "rm1=", tf rm1, " ; ",
-                                          "hash=", hash' dat, "\n"]
+                                          "rm2=", tf rm2, " ; ",
+                                          "token=", (if rm2 then hash' dat else token'), "\n"]
   hash'                      =  blaze . Bytes.pack . (\x -> showIntAtBase 16 intToDigit x "") . abs . hash . Blaze.toByteString
+  token'                     =  "`date -u +%FT%TZ | tr :- ..`-`hexdump -n4 -e '\"%08x\"' </dev/urandom`"
   blaze                      =  Blaze.fromByteString
   tf True                    =  "true"
   tf False                   =  "false"

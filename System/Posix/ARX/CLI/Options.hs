@@ -39,7 +39,7 @@ shdat                        =  do
     f _ stuff                =  stuff
 
 tmpx :: ArgsParser ( [Word], [IOStream], [IOStream], [(Sh.Var, Sh.Val)],
-                     [(Bool, Bool)], [ByteSource]                        )
+                     [(Bool, Bool, Bool)], [ByteSource]                        )
 tmpx                         =  do
   arg "tmpx"
   bars                      <-  (try . lookAhead) slashes
@@ -91,9 +91,10 @@ ioStream                     =  STDIO <$  tokCL Dash
 qPath                       ::  ArgsParser ByteString
 qPath                        =  tokCL QualifiedPath
 
-rm                          ::  ArgsParser (Bool, Bool)
-rm  =   (True,  False) <$ arg "-rm0"  <|>  (False, True) <$ arg "-rm1"
-   <|>  (False, False) <$ arg "-rm!"  <|>  (True,  True) <$ arg "-rm_"
+rm                          ::  ArgsParser (Bool, Bool, Bool)
+rm  =   (True,  False, False) <$ arg "-rm0"  <|>  (False, True, False) <$ arg "-rm1"
+   <|>  (False, False, False) <$ arg "-rm!"  <|>  (True,  True, False) <$ arg "-rm_"
+   <|>  (False, False, True)  <$ arg "-rm."
 
 env                         ::  ArgsParser (Sh.Var, Sh.Val)
 env                          =  do
