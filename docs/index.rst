@@ -104,6 +104,12 @@ family of options).
     to be generated that deletes the temporary directory only on success, only
     on failure, always (the default) or never.
 
+  ``--shared``
+    Causes the temporary directory to be identified by a hash of the ARX
+    archive, instead of by date and time. Different runs of the same archive
+    will share the same directory. Note that this implies shared state and
+    every disadvantage thereof.
+
   ``-b <size>``
     Please see the documentation for this option, shared with `shdat`, below.
 

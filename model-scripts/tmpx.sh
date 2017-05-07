@@ -2,8 +2,8 @@
 set -e -u
 unset rm_ dir
 tmp=true ; run=true
-token=`date -u +%FT%TZ | tr :- ..`-`hexdump -n4 -e '"%08x"' </dev/urandom`
-rm0=true ; rm1=true ; rm2=false # To be set by tool.
+rm0=true ; rm1=true ; shared=false ; hash="" # To be set by tool.
+token=`date -u +%FT%TZ | tr -d :-`-`hexdump -n4 -e '"%08x"' </dev/urandom`
 opts() {
   cmd="$1" ; shift
   n=$#
@@ -15,6 +15,7 @@ opts() {
   do
     arg="$1" ; shift
     case "$arg!$magic_slash" in
+      --shared!false)  shared=true ;;
       --no-rm!false)   rm_=false ;;
       --no-run!false)  run=false ;;
       --extract!false) rm_=false ; tmp=false ; run=false ;;
@@ -35,7 +36,13 @@ opts() {
   # Set the trap.
   if $tmp
   then
-    dir=/tmp/tmpx-"$token"
+    if $shared
+    then
+      rm_=false
+      dir=/tmp/tmpx-"$hash"
+    else
+      dir=/tmp/tmpx-"$token"
+    fi
     : ${rm_:=true}
     if $rm_
     then
@@ -45,19 +52,24 @@ opts() {
             esac' EXIT
       trap 'exit 2' HUP INT QUIT BUS SEGV PIPE TERM
     fi
-    $rm2 || mkdir "$dir"
+    mkdir -p "$dir"
     cd "$dir"
   fi
   # Call the command with the reassembled ARGV, options removed.
   "$cmd" "$@"
 }
 go () {
-  [ -f env ] && $rm2 || unpack_env > ./env
-  [ -f run ] && $rm2 || unpack_run > ./run
+  [ -f env ] || unpack_env > ./env
+  [ -f run ] || unpack_run > ./run
   chmod ug+x ./run
-  [ -d dat ] && $rm2 || mkdir dat
-  cd dat
-  $rm2 || unpack_dat
+  if [ -d dat ]
+  then
+    cd dat
+  else
+    mkdir dat
+    cd dat
+    unpack_dat
+  fi
   if $run
   then
     ( . ../env && ../run "$@" )

@@ -43,11 +43,11 @@ main                         =  do
       let apply i            =  interpret (SHDAT size) <$> inIOStream i
       mapM_ ((send out =<<) . apply) ins
     Right (Right tmpxArgs)  ->  do
-      let (size, out, tars, env, (rm0, rm1, rm2), cmd) = tmpxResolve tmpxArgs
+      let (sz, out, tars, env, (rm0, rm1), shared, cmd) = tmpxResolve tmpxArgs
       case tmpxCheckStreams tars cmd of Nothing  -> return ()
                                         Just msg -> do die msg
       cmd'                  <-  openByteSource cmd
-      let tmpx               =  TMPX (SHDAT size) cmd' env rm0 rm1 rm2
+      let tmpx               =  TMPX (SHDAT sz) cmd' env rm0 rm1 shared
       (badAr, goodAr)       <-  partitionEithers <$> mapM openArchive tars
       (badAr /= []) `when` do (((die .) .) . blockMessage)
                                 "The file magic of some archives:"
@@ -86,15 +86,18 @@ shdatCheckStreams ins        =  streamsMessage [ins']
 {-| Apply defaulting and overrides appropriate to 'TMPX' programs.
  -}
 tmpxResolve                 ::  ( [Word], [IOStream], [IOStream],
-                                  [(Var, Val)], [(Bool, Bool, Bool)], [ByteSource] )
+                                  [(Var, Val)], [(Bool, Bool)], [Bool],
+                                  [ByteSource]                          )
                             ->  ( Word, IOStream, [IOStream],
-                                  [(Var, Val)], (Bool, Bool, Bool), ByteSource )
-tmpxResolve (sizes, outs, tars, env, rms, cmds) =
-  (size, out, tars, env, rm, cmd)
+                                  [(Var, Val)], (Bool, Bool), Bool,
+                                  ByteSource                        )
+tmpxResolve (sizes, outs, tars, env, rms, shareds, cmds) =
+  (size, out, tars, env, rm, shared, cmd)
  where
   size                       =  last (defaultBlock:sizes)
   out                        =  last (STDIO:outs)
-  rm                         =  last ((True,True,False):rms)
+  rm                         =  last ((True,True):rms)
+  shared                     =  last (False:shareds)
   cmd                        =  last (defaultTask:cmds)
 
 tmpxCheckStreams            ::  [IOStream] -> ByteSource -> Maybe ByteString

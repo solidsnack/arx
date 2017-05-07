@@ -7,25 +7,28 @@ module System.Posix.ARX.TMPXTools where
 
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as Bytes
+import Data.Char
 import Data.List
 import Data.Maybe
 import Data.Monoid
+import Numeric
+
 
 import qualified Blaze.ByteString.Builder as Blaze
 import Data.FileEmbed
+import Data.Hashable
 
-import Data.Hashable (hash)
-import Numeric (showIntAtBase)
-import Data.Char (intToDigit)
 
-data Template = Template { rm0 :: Bool, {-^ Remove tmp on run success?    -}
-                           rm1 :: Bool, {-^ Remove tmp on run error?      -}
-                           env :: Blaze.Builder, {-^ Stream for env text. -}
-                           run :: Blaze.Builder, {-^ Stream for run text. -}
-                           dat :: Blaze.Builder  {-^ Data unpacking text. -} }
+data Template = Template { rm0    :: Bool, {-^ Remove tmp on run success?    -}
+                           rm1    :: Bool, {-^ Remove tmp on run error?      -}
+                           shared :: Bool, {-^ Share directory across runs?  -}
+                           env    :: Blaze.Builder, {-^ Stream for env text. -}
+                           run    :: Blaze.Builder, {-^ Stream for run text. -}
+                           dat    :: Blaze.Builder  {-^ Data text. -} }
 instance Show Template where
   show Template{..} =
-    "Template { rm0=" ++ tf rm0 ++ " rm1=" ++ tf rm1 ++ " ... }"
+    "Template { rm0=" ++ tf rm0 ++ " rm1=" ++ tf rm1 ++
+              " shared=" ++ tf shared ++  " ... }"
    where
     tf True                  =  "true"
     tf False                 =  "false"
@@ -43,10 +46,11 @@ render Template{..}          =  mconcat [ blaze a,
  where
   flags                      =  mconcat [ "rm0=", tf rm0, " ; ",
                                           "rm1=", tf rm1, " ; ",
-                                          "rm2=", tf rm2, " ; ",
-                                          "token=", (if rm2 then hash' dat else token'), "\n"]
-  hash'                      =  blaze . Bytes.pack . (\x -> showIntAtBase 16 intToDigit x "") . abs . hash . Blaze.toByteString
-  token'                     =  "`date -u +%FT%TZ | tr :- ..`-`hexdump -n4 -e '\"%08x\"' </dev/urandom`"
+                                          "shared=", tf shared, " ; ",
+                                          "hash=", (hexStr . hash) dat, "\n" ]
+  hash                       =  abs . Data.Hashable.hash . Blaze.toByteString
+  hexStr                     =  blaze . Bytes.pack . hex
+  hex i = Numeric.showIntAtBase 16 Data.Char.intToDigit i ""
   blaze                      =  Blaze.fromByteString
   tf True                    =  "true"
   tf False                   =  "false"

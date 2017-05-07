@@ -1,9 +1,9 @@
 SYNOPSIS
-       arx (-h | -[?] | --help)
-       arx (-v | --version)
-       arx shdat (-b <size>)? (-o <output file>)? < input
-       arx shdat (-b <size>)? (-o <output file>)? <input file>+
-       arx tmpx <option,archive>* (//+ <command> (//+ <option,archive>*)?)?
+          arx (-h | -[?] | --help)
+          arx (-v | --version)
+          arx shdat (-b <size>)? (-o <output file>)? < input
+          arx shdat (-b <size>)? (-o <output file>)? <input file>+
+          arx tmpx <option,archive>* (//+ <command> (//+ <option,archive>*)?)?
 
 DESCRIPTION
        A  UNIX  executable is a simple thing -- a file the kernel can execute,
@@ -38,12 +38,12 @@ APPLICATION
        cute them. This can be helpful when using ssh and sudo  to  set  up  an
        execution context; for example:
 
-       arx tmpx ... | ssh user@host.com sudo sh
+          arx tmpx ... | ssh user@host.com sudo sh
 
        Scripts  generated  by  tmpx will pass their arguments to the contained
        script or command. To pass arguments when piping to sh, use -s:
 
-       arx tmpx ... | ssh user@host.com sudo sh -s a b c
+          arx tmpx ... | ssh user@host.com sudo sh -s a b c
 
        Some arguments to the  generated  script  will  be  treated  specially,
        namely,  --extract,  --no-rm  and  --no-run.  Please see the section on
@@ -85,80 +85,86 @@ TMPX
                  temporary directory only on success, only on failure,  always
                  (the default) or never.
 
+          --shared
+                 Causes  the temporary directory to be identified by a hash of
+                 the ARX archive, instead of by date and time. Different  runs
+                 of  the same archive will share the same directory. Note that
+                 this implies shared state and every disadvantage thereof.
+
           -b <size>
-                 Please  see  the  documentation  for this option, shared with
+                 Please see the documentation for  this  option,  shared  with
                  shdat, below.
 
           -o <path>
-                 By default, the generated script is sent to STDOUT. With  -o,
+                 By  default, the generated script is sent to STDOUT. With -o,
                  output is redirected to the given path.
 
           -e <path>
-                 Causes  the  file  specified to be packaged as the task to be
-                 run. A binary executable, a Ruby script or  a  longish  shell
+                 Causes the file specified to be packaged as the  task  to  be
+                 run.  A  binary  executable, a Ruby script or a longish shell
                  script all fit here.
 
-       In  addition to these options, arguments of the form VAR=VALUE are rec-
-       ognized as environment mappings and stored away in the  script,  to  be
+       In addition to these options, arguments of the form VAR=VALUE are  rec-
+       ognized  as  environment  mappings and stored away in the script, to be
        sourced on execution.
 
-       Without  -e,  the tmpx subcommand tries to find the task to be run as a
-       sequence of arguments delimited by a  run  of  slashes.  The  following
+       Without -e, the tmpx subcommand tries to find the task to be run  as  a
+       sequence  of  arguments  delimited  by  a run of slashes. The following
        forms are all recognized:
 
-       arx tmpx  ...some args... // ...command...
-       arx tmpx  ...some args... // ...command... // ...more args...
-       arx tmpx // ...command... // ...some args...
+          arx tmpx  ...some args... // ...command...
+          arx tmpx  ...some args... // ...command... // ...more args...
+          arx tmpx // ...command... // ...some args...
 
-       The  slash  runs  must  have the same number of slashes and must be the
-       longest continuous runs of slashes on the  command  line.  The  command
+       The slash runs must have the same number of slashes  and  must  be  the
+       longest  continuous  runs  of  slashes on the command line. The command
        will be included as-is in a Bourne shell script.
 
 SHDAT
-       The  shdat subcommand translates binary data in to a shell script which
-       outputs the binary data. The data is encoded in HERE documents in  such
-       a  way that data without NULs is not changed and that data with NULs is
-       minimally expanded: about 1% for randomish data  like  compressed  tar-
+       The shdat subcommand translates binary data in to a shell script  which
+       outputs  the binary data. The data is encoded in HERE documents in such
+       a way that data without NULs is not changed and that data with NULs  is
+       minimally  expanded:  about  1% for randomish data like compressed tar-
        balls and about 10% in pathological cases.
 
-       The  shdat  subcommand  can be given any number of paths, which will be
+       The shdat subcommand can be given any number of paths,  which  will  be
        concatenated in the order given. If no path is given, or if - is given,
        then STDIN will be read.
 
           -b <size>
-                 The  size  of data chunks to place in each HERE document. The
-                 argument is a positive integer followed by suffixes  like  B,
-                 K,  KiB,  M and MiB, in the manner of dd, head and many other
-                 tools. The default is 4MiB.  This is unlikely to make a  dif-
+                 The size of data chunks to place in each HERE  document.  The
+                 argument  is  a positive integer followed by suffixes like B,
+                 K, KiB, M and MiB, in the manner of dd, head and  many  other
+                 tools.  The default is 4MiB.  This is unlikely to make a dif-
                  ference for you unless the generated script is intended to be
                  run on a memory-constrained system.
 
           -o <path>
-                 By default, the generated script is sent to STDOUT. With  -o,
+                 By  default, the generated script is sent to STDOUT. With -o,
                  output is redirected to the given path.
 
 EXAMPLES
-       # Installer script that preserves failed builds.
-       git archive HEAD | bzip2 | arx tmpx -rm0 - // make install > go.sh
-       # Now install as root; but don't log in as root.
-       cat ./go.sh | ssh joey@hostname sudo /bin/sh
+          # Installer script that preserves failed builds.
+          git archive HEAD | bzip2 | arx tmpx -rm0 - // make install > go.sh
+          # Now install as root; but don't log in as root.
+          cat ./go.sh | ssh joey@hostname sudo /bin/sh
 
-       # Variation of the above.
-       git archive HEAD | bzip2 | arx tmpx -rm0 - -e ./build-script.py > go.sh
+          # Variation of the above.
+          git archive HEAD | bzip2 | arx tmpx -rm0 - -e ./build-script.py > go.sh
 
-       # Bundle an instance of an application with DB credentials and run it.
-       arx tmpx -rm! ./app.tbz ./stage-info.tgz // rake start | ssh ...
+          # Bundle an instance of an application with DB credentials and run it.
+          arx tmpx -rm! ./app.tbz ./stage-info.tgz // rake start | ssh ...
 
-       # Get dump of linking info for build that works here but not there.
-       arx tmpx ./server-build.tgz LD_DEBUG=files // ./bin/start | ssh ...
+          # Get dump of linking info for build that works here but not there.
+          arx tmpx ./server-build.tgz LD_DEBUG=files // ./bin/start | ssh ...
 
-       # Test out Cabal source distribution of this package:
-       arx tmpx // 'cd arx-* && cabal configure && cabal build' // \
-                -rm0 ./dist/arx-0.0.0.tar.gz | sh
+          # Test out Cabal source distribution of this package:
+          arx tmpx // 'cd arx-* && cabal configure && cabal build' // \
+                   -rm0 ./dist/arx-0.0.0.tar.gz | sh
 
 PASSING ARGUMENTS TO GENERATED SCRIPTS
        The scripts generated by tmpx treat some arguments as special, internal
-       options, to allow for inspecting them should there be a need to  deter-
+       options,  to allow for inspecting them should there be a need to deter-
        mine their contents.
 
           --extract
@@ -169,28 +175,28 @@ PASSING ARGUMENTS TO GENERATED SCRIPTS
                  porary directory.
 
           --no-run
-                 Unpack  into  a  temporary directory as normal but do not run
+                 Unpack into a temporary directory as normal but  do  not  run
                  the user's command.
 
-       To prevent arguments from being specially treated, use // in the  argu-
+       To  prevent arguments from being specially treated, use // in the argu-
        ment list:
 
-       a-tmpx-script.sh --no-rm // a b c --extract
+          a-tmpx-script.sh --no-rm // a b c --extract
 
        In the above example, --extract will be passed to the inner command, in
        the same way as a, b, c. The following example causes ab, c and --no-rm
        to be printed one after another, each on their own line.
 
-       arx tmpx // printf "'%s\n'" '"$@"' | sh -s // ab c --no-rm
+          arx tmpx // printf "'%s\n'" '"$@"' | sh -s // ab c --no-rm
 
 NOTES
-       The  timestamp  is  not the common ISO 8601 format, %Y-%m-%dT%H:%M:%SZ,
-       because of software and build processes that attach special meaning  to
+       The timestamp is not the common ISO  8601  format,  %Y-%m-%dT%H:%M:%SZ,
+       because  of software and build processes that attach special meaning to
        colons in pathnames.
 
 BUGS
-       The  command  line parser offers no hints or help of any kind; it fails
-       with the simple message "argument error". The two most common  mistakes
+       The command line parser offers no hints or help of any kind;  it  fails
+       with  the simple message "argument error". The two most common mistakes
        I make are:
 
        o Not qualifying paths with /, ./ or ../.
