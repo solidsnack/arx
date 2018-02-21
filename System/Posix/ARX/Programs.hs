@@ -70,6 +70,7 @@ instance ARX TMPX [(Tar, LazyB.ByteString)] where
     flags TAR                =  "-x"
     flags TGZ                =  "-x -z"
     flags TBZ                =  "-x -j"
+    flags TXZ                =  "-x -J"
     run' = case run of ""   ->  ""
                        _    ->  shdat run
     env' = case env of _:_  ->  (shdat . unblz . Sh.render) env
