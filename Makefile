@@ -60,8 +60,7 @@ tmp/arx.cabal: dist/build/arx/arx
 dist/build/arx/arx: cabal
 
 cabal: version
-	cabal configure --disable-executable-profiling \
-	                --disable-library-profiling
+	cabal configure --disable-profiling
 	cabal build
 
 doc:

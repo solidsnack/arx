@@ -15,6 +15,7 @@ import Data.List
 import Data.Maybe
 import Data.Monoid
 import Data.Ord
+import Data.Semigroup
 import Data.Word
 import System.Environment
 import System.Exit (exitFailure)
@@ -150,14 +151,15 @@ defaultTask                  =  ByteString "/bin/true"
 
 
 data ZOM                     =  Zero | One !ByteString | Many ![ByteString]
+instance Semigroup ZOM where
+  Zero    <> x        =  x
+  x       <> Zero     =  x
+  One m   <> One m'   =  Many [m, m']
+  One m   <> Many ms  =  Many (mappend [m] ms)
+  Many ms <> One m    =  Many (mappend ms  [m])
+  Many ms <> Many ms' =  Many (mappend ms  ms')
 instance Monoid ZOM where
   mempty                     =  Zero
-  Zero    `mappend` x        =  x
-  x       `mappend` Zero     =  x
-  One m   `mappend` One m'   =  Many [m, m']
-  One m   `mappend` Many ms  =  Many (mappend [m] ms)
-  Many ms `mappend` One m    =  Many (mappend ms  [m])
-  Many ms `mappend` Many ms' =  Many (mappend ms  ms')
 
 streamsMessage filtered      =  case foldl' mappend Zero filtered of
   Many messages             ->  Just (template messages)

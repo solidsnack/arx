@@ -85,8 +85,8 @@ library
                                 System.Posix.ARX.HEREDat
                                 System.Posix.ARX.Programs
                                 System.Posix.ARX.Sh
-                                System.Posix.ARX.Tar
                                 System.Posix.ARX.TMPXTools
+                                System.Posix.ARX.Tar
   extensions                  : FlexibleInstances
                                 FunctionalDependencies
                                 MultiParamTypeClasses
@@ -119,4 +119,13 @@ executable                      arx
                                 OverloadedStrings
                                 StandaloneDeriving
                                 TupleSections
+  other-modules:                System.Posix.ARX
+                                System.Posix.ARX.CLI
+                                System.Posix.ARX.CLI.CLTokens
+                                System.Posix.ARX.CLI.Options
+                                System.Posix.ARX.HEREDat
+                                System.Posix.ARX.Programs
+                                System.Posix.ARX.Sh
+                                System.Posix.ARX.TMPXTools
+                                System.Posix.ARX.Tar
 
