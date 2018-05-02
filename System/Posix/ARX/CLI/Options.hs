@@ -54,31 +54,34 @@ tmpx                         =  do
   flags                      =  manyTill flag
   gather = (ByteString . Char8.unwords <$>) . manyTill anyArg
   flag                       =  _1 blockSize <|> _2 outputFile <|> _3 ioStream
-                            <|> _4 env       <|> _5 rm         <|> _6 shared
-                            <|> _7 scriptToRun
-  _1 = ((,Nothing,Nothing,Nothing,Nothing,Nothing,Nothing) . Just <$>)
-  _2 = ((Nothing,,Nothing,Nothing,Nothing,Nothing,Nothing) . Just <$>)
-  _3 = ((Nothing,Nothing,,Nothing,Nothing,Nothing,Nothing) . Just <$>)
-  _4 = ((Nothing,Nothing,Nothing,,Nothing,Nothing,Nothing) . Just <$>)
-  _5 = ((Nothing,Nothing,Nothing,Nothing,,Nothing,Nothing) . Just <$>)
-  _6 = ((Nothing,Nothing,Nothing,Nothing,Nothing,,Nothing) . Just <$>)
-  _7 = ((Nothing,Nothing,Nothing,Nothing,Nothing,Nothing,) . Just <$>)
+                            <|> _4 env       <|> _5 tmpdir     <|> _6 rm
+                            <|> _7 shared    <|> _8 scriptToRun
+  _1 = ((,Nothing,Nothing,Nothing,Nothing,Nothing,Nothing,Nothing) . Just <$>)
+  _2 = ((Nothing,,Nothing,Nothing,Nothing,Nothing,Nothing,Nothing) . Just <$>)
+  _3 = ((Nothing,Nothing,,Nothing,Nothing,Nothing,Nothing,Nothing) . Just <$>)
+  _4 = ((Nothing,Nothing,Nothing,,Nothing,Nothing,Nothing,Nothing) . Just <$>)
+  _5 = ((Nothing,Nothing,Nothing,Nothing,,Nothing,Nothing,Nothing) . Just <$>)
+  _6 = ((Nothing,Nothing,Nothing,Nothing,Nothing,,Nothing,Nothing) . Just <$>)
+  _7 = ((Nothing,Nothing,Nothing,Nothing,Nothing,Nothing,,Nothing) . Just <$>)
+  _8 = ((Nothing,Nothing,Nothing,Nothing,Nothing,Nothing,Nothing,) . Just <$>)
   coalesce                   =  foldr f ([], [], [], [], [], [], [])
    where
-    f (Just a, _, _, _, _, _, _)   (as, bs, cs, ds, es, fs, gs)
-                                =  (a:as, bs, cs, ds, es, fs, gs)
-    f (_, Just b, _, _, _, _, _)   (as, bs, cs, ds, es, fs, gs)
-                                =  (as, b:bs, cs, ds, es, fs, gs)
-    f (_, _, Just c, _, _, _, _)   (as, bs, cs, ds, es, fs, gs)
-                                =  (as, bs, c:cs, ds, es, fs, gs)
-    f (_, _, _, Just d, _, _, _)   (as, bs, cs, ds, es, fs, gs)
-                                =  (as, bs, cs, d:ds, es, fs, gs)
-    f (_, _, _, _, Just e, _, _)   (as, bs, cs, ds, es, fs, gs)
-                                =  (as, bs, cs, ds, e:es, fs, gs)
-    f (_, _, _, _, _, Just f, _)   (as, bs, cs, ds, es, fs, gs)
-                                =  (as, bs, cs, ds, es, f:fs, gs)
-    f (_, _, _, _, _, _, Just g)   (as, bs, cs, ds, es, fs, gs)
-                                =  (as, bs, cs, ds, es, fs, g:gs)
+    f (Just a, _, _, _, _, _, _, _)   (as, bs, cs, ds, es, fs, gs, hs)
+                                =  (a:as, bs, cs, ds, es, fs, gs, hs)
+    f (_, Just b, _, _, _, _, _, _)   (as, bs, cs, ds, es, fs, gs, hs)
+                                =  (as, b:bs, cs, ds, es, fs, gs, hs)
+    f (_, _, Just c, _, _, _, _, _)   (as, bs, cs, ds, es, fs, gs, hs)
+                                =  (as, bs, c:cs, ds, es, fs, gs, hs)
+    f (_, _, _, Just d, _, _, _, _)   (as, bs, cs, ds, es, fs, gs, hs)
+                                =  (as, bs, cs, d:ds, es, fs, gs, hs)
+    f (_, _, _, _, Just e, _, _, _)   (as, bs, cs, ds, es, fs, gs, hs)
+                                =  (as, bs, cs, ds, e:es, fs, gs, hs)
+    f (_, _, _, _, _, Just f, _, _)   (as, bs, cs, ds, es, fs, gs, hs)
+                                =  (as, bs, cs, ds, es, f:fs, gs, hs)
+    f (_, _, _, _, _, _, Just g, _)   (as, bs, cs, ds, es, fs, gs, hs)
+                                =  (as, bs, cs, ds, es, fs, g:gs, hs)
+    f (_, _, _, _, _, _, _, Just h)   (as, bs, cs, ds, es, fs, gs, hs)
+                                =  (as, bs, cs, ds, es, fs, gs, h:hs)
     f _ stuff                   =  stuff
 
 blockSize                   ::  ArgsParser Word
@@ -98,6 +101,8 @@ qPath                        =  tokCL QualifiedPath
 shared                      ::  ArgsParser Bool
 shared                       =  True <$ arg "--shared"
 
+tmpdir                       :: ArgsParser Path
+                             = arg "--tmpdir" >> QualifiedPath
 
 rm                          ::  ArgsParser (Bool, Bool)
 rm  =   (True,  False) <$ arg "-rm0"  <|>  (False, True) <$ arg "-rm1"

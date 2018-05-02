@@ -22,12 +22,13 @@ import Data.Hashable
 data Template = Template { rm0    :: Bool, {-^ Remove tmp on run success?    -}
                            rm1    :: Bool, {-^ Remove tmp on run error?      -}
                            shared :: Bool, {-^ Share directory across runs?  -}
+                           tmpdir :: String, {-^ Location to store tmp files.-}
                            env    :: Blaze.Builder, {-^ Stream for env text. -}
                            run    :: Blaze.Builder, {-^ Stream for run text. -}
                            dat    :: Blaze.Builder  {-^ Data text. -} }
 instance Show Template where
   show Template{..} =
-    "Template { rm0=" ++ tf rm0 ++ " rm1=" ++ tf rm1 ++
+    "Template { tmpdir=" tmpdir ++ " rm0=" ++ tf rm0 ++ " rm1=" ++ tf rm1 ++
               " shared=" ++ tf shared ++  " ... }"
    where
     tf True                  =  "true"
@@ -47,14 +48,15 @@ render Template{..}          =  mconcat [ blaze a,
   flags                      =  mconcat [ "rm0=", tf rm0, " ; ",
                                           "rm1=", tf rm1, " ; ",
                                           "shared=", tf shared, " ; ",
-                                          "hash=", (hexStr . hash) dat, "\n" ]
+                                          "hash=", (hexStr . hash) dat,
+                                          "tmpdir=", tmpdir, "\n" ]
   hash                       =  abs . Data.Hashable.hash . Blaze.toByteString
   hexStr                     =  blaze . Bytes.pack . hex
   hex i = Numeric.showIntAtBase 16 Data.Char.intToDigit i ""
   blaze                      =  Blaze.fromByteString
   tf True                    =  "true"
   tf False                   =  "false"
-  a : b : c : d : e : [] = findChunks $(embedFile "./model-scripts/tmpx.sh")
+  a : b : c : d : e : f : [] = findChunks $(embedFile "./model-scripts/tmpx.sh")
 
 findChunks                  ::  ByteString -> [ByteString]
 findChunks                   =  coalesce . markHoles

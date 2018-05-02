@@ -2,7 +2,7 @@
 set -e -u
 unset rm_ dir
 tmp=true ; run=true
-rm0=true ; rm1=true ; shared=false ; hash="" # To be set by tool.
+tmpdir= ; rm0=true ; rm1=true ; shared=false ; hash="" # To be set by tool.
 token=`date -u +%FT%TZ | tr -d :-`-`hexdump -n4 -e '"%08x"' </dev/urandom`
 opts() {
   cmd="$1" ; shift
@@ -39,9 +39,9 @@ opts() {
     if $shared
     then
       rm_=false
-      dir=/tmp/tmpx-"$hash"
+      dir=$tmpdir/tmpx-"$hash"
     else
-      dir=/tmp/tmpx-"$token"
+      dir=$tmpdir/tmpx-"$token"
     fi
     : ${rm_:=true}
     if $rm_
