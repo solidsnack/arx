@@ -44,11 +44,12 @@ main                         =  do
       let apply i            =  interpret (SHDAT size) <$> inIOStream i
       mapM_ ((send out =<<) . apply) ins
     Right (Right tmpxArgs)  ->  do
-      let (sz, out, tars, env, (rm0, rm1), shared, cmd) = tmpxResolve tmpxArgs
+      let (sz, out, tars, env, tmpdir,
+           (rm0, rm1), shared, cmd) = tmpxResolve tmpxArgs
       case tmpxCheckStreams tars cmd of Nothing  -> return ()
                                         Just msg -> do die msg
       cmd'                  <-  openByteSource cmd
-      let tmpx               =  TMPX (SHDAT sz) cmd' env rm0 rm1 shared
+      let tmpx               =  TMPX (SHDAT sz) cmd' env tmpdir rm0 rm1 shared
       (badAr, goodAr)       <-  partitionEithers <$> mapM openArchive tars
       (badAr /= []) `when` do (((die .) .) . blockMessage)
                                 "The file magic of some archives:"
@@ -87,16 +88,17 @@ shdatCheckStreams ins        =  streamsMessage [ins']
 {-| Apply defaulting and overrides appropriate to 'TMPX' programs.
  -}
 tmpxResolve                 ::  ( [Word], [IOStream], [IOStream],
-                                  [(Var, Val)], [(Bool, Bool)], [Bool],
-                                  [ByteSource]                          )
+                                  [(Var, Val)], [String], [(Bool, Bool)],
+                                  [Bool], [ByteSource]              )
                             ->  ( Word, IOStream, [IOStream],
-                                  [(Var, Val)], (Bool, Bool), Bool,
+                                  [(Var, Val)], String, (Bool, Bool), Bool,
                                   ByteSource                        )
-tmpxResolve (sizes, outs, tars, env, rms, shareds, cmds) =
-  (size, out, tars, env, rm, shared, cmd)
+tmpxResolve (sizes, outs, tars, env, dirs, rms, shareds, cmds) =
+  (size, out, tars, env, tmpdir, rm, shared, cmd)
  where
   size                       =  last (defaultBlock:sizes)
   out                        =  last (STDIO:outs)
+  tmpdir                     =  last ("/tmp":dirs)
   rm                         =  last ((True,True):rms)
   shared                     =  last (False:shareds)
   cmd                        =  last (defaultTask:cmds)

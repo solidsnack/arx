@@ -57,12 +57,13 @@ instance ARX SHDAT LazyB.ByteString where
  -}
 data TMPX = TMPX SHDAT LazyB.ByteString -- Code of task to run.
                        [(Sh.Var, Sh.Val)] -- Environment mapping.
+                       String -- Place to put tmp dir.
                        Bool -- Destroy tmp if task runs successfully.
                        Bool -- Destroy tmp if task exits with an error code.
                        Bool -- Reuse tmp dir if available.
 instance ARX TMPX [(Tar, LazyB.ByteString)] where
-  interpret (TMPX encoder run env rm0 rm1 rm2) stuff = TMPXTools.render
-    (TMPXTools.Template rm0 rm1 rm2 env' run' archives)
+  interpret (TMPX encoder run env tmpdir rm0 rm1 rm2) stuff = TMPXTools.render
+    (TMPXTools.Template tmpdir rm0 rm1 rm2 env' run' archives)
    where
     archives                 =  mconcat (uncurry archive <$> stuff)
     archive tar bytes        =  mconcat
