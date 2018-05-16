@@ -39,7 +39,7 @@ shdat                        =  do
     f _ stuff                =  stuff
 
 tmpx :: ArgsParser ( [Word], [IOStream], [IOStream], [(Sh.Var, Sh.Val)],
-                     [(Bool, Bool)], [Bool], [ByteSource]                )
+                     [ByteString], [(Bool, Bool)], [Bool], [ByteSource] )
 tmpx                         =  do
   arg "tmpx"
   bars                      <-  (try . lookAhead) slashes
@@ -47,7 +47,7 @@ tmpx                         =  do
                  Nothing    ->  flags eof
                  Just bars  ->  do let eof_bars = () <$ arg bars <|> eof
                                    before <- flags eof_bars
-                                   cmd <- _7 (gather eof_bars)
+                                   cmd <- _8 (gather eof_bars)
                                    after <- flags eof
                                    return (before ++ (cmd:after))
  where
@@ -64,7 +64,7 @@ tmpx                         =  do
   _6 = ((Nothing,Nothing,Nothing,Nothing,Nothing,,Nothing,Nothing) . Just <$>)
   _7 = ((Nothing,Nothing,Nothing,Nothing,Nothing,Nothing,,Nothing) . Just <$>)
   _8 = ((Nothing,Nothing,Nothing,Nothing,Nothing,Nothing,Nothing,) . Just <$>)
-  coalesce                   =  foldr f ([], [], [], [], [], [], [])
+  coalesce                   =  foldr f ([], [], [], [], [], [], [], [])
    where
     f (Just a, _, _, _, _, _, _, _)   (as, bs, cs, ds, es, fs, gs, hs)
                                 =  (a:as, bs, cs, ds, es, fs, gs, hs)
@@ -101,8 +101,8 @@ qPath                        =  tokCL QualifiedPath
 shared                      ::  ArgsParser Bool
 shared                       =  True <$ arg "--shared"
 
-tmpdir                       :: ArgsParser Path
-                             = arg "--tmpdir" >> QualifiedPath
+tmpdir                      ::  ArgsParser ByteString
+tmpdir                       =  arg "--tmpdir" >> tokCL QualifiedPath
 
 rm                          ::  ArgsParser (Bool, Bool)
 rm  =   (True,  False) <$ arg "-rm0"  <|>  (False, True) <$ arg "-rm1"

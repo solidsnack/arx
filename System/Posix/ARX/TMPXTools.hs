@@ -22,13 +22,14 @@ import Data.Hashable
 data Template = Template { rm0    :: Bool, {-^ Remove tmp on run success?    -}
                            rm1    :: Bool, {-^ Remove tmp on run error?      -}
                            shared :: Bool, {-^ Share directory across runs?  -}
-                           tmpdir :: String, {-^ Location to store tmp files.-}
+                           tmpdir :: ByteString,    {-^ Temp file location.  -}
                            env    :: Blaze.Builder, {-^ Stream for env text. -}
                            run    :: Blaze.Builder, {-^ Stream for run text. -}
                            dat    :: Blaze.Builder  {-^ Data text. -} }
 instance Show Template where
   show Template{..} =
-    "Template { tmpdir=" tmpdir ++ " rm0=" ++ tf rm0 ++ " rm1=" ++ tf rm1 ++
+    "Template { tmpdir=" ++ Bytes.unpack tmpdir
+              ++ " rm0=" ++ tf rm0 ++ " rm1=" ++ tf rm1 ++
               " shared=" ++ tf shared ++  " ... }"
    where
     tf True                  =  "true"
@@ -48,8 +49,8 @@ render Template{..}          =  mconcat [ blaze a,
   flags                      =  mconcat [ "rm0=", tf rm0, " ; ",
                                           "rm1=", tf rm1, " ; ",
                                           "shared=", tf shared, " ; ",
-                                          "hash=", (hexStr . hash) dat,
-                                          "tmpdir=", tmpdir, "\n" ]
+                                          "hash=", (hexStr . hash) dat, " ; ",
+                                          "tmpdir=", blaze tmpdir, "\n" ]
   hash                       =  abs . Data.Hashable.hash . Blaze.toByteString
   hexStr                     =  blaze . Bytes.pack . hex
   hex i = Numeric.showIntAtBase 16 Data.Char.intToDigit i ""
