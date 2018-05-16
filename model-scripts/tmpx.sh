@@ -39,9 +39,9 @@ opts() {
     if $shared
     then
       rm_=false
-      dir=$tmpdir/tmpx-"$hash"
+      dir="$tmpdir"/tmpx-"$hash"
     else
-      dir=$tmpdir/tmpx-"$token"
+      dir="$tmpdir"/tmpx-"$token"
     fi
     : ${rm_:=true}
     if $rm_

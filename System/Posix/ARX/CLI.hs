@@ -88,10 +88,10 @@ shdatCheckStreams ins        =  streamsMessage [ins']
 {-| Apply defaulting and overrides appropriate to 'TMPX' programs.
  -}
 tmpxResolve                 ::  ( [Word], [IOStream], [IOStream],
-                                  [(Var, Val)], [String], [(Bool, Bool)],
+                                  [(Var, Val)], [ByteString], [(Bool, Bool)],
                                   [Bool], [ByteSource]              )
                             ->  ( Word, IOStream, [IOStream],
-                                  [(Var, Val)], String, (Bool, Bool), Bool,
+                                  [(Var, Val)], ByteString, (Bool, Bool), Bool,
                                   ByteSource                        )
 tmpxResolve (sizes, outs, tars, env, dirs, rms, shareds, cmds) =
   (size, out, tars, env, tmpdir, rm, shared, cmd)
@@ -114,13 +114,13 @@ tmpxCheckStreams tars cmd    =  streamsMessage [tars', cmd']
     | cmd == IOStream STDIO  =  One "as a command input"
     | otherwise              =  Zero
 
-tmpxOpen :: Word -> [(Var, Val)] -> (Bool, Bool, Bool) -> ByteSource -> IO TMPX
-tmpxOpen size env (rm0, rm1, rm2) cmd = do
+tmpxOpen :: Word -> [(Var, Val)] -> (Bool, Bool, Bool) -> ByteString -> ByteSource -> IO TMPX
+tmpxOpen size env (rm0, rm1, rm2) tmpdir cmd = do
   text                      <-  case cmd of
     ByteString b            ->  return (LazyB.fromChunks [b])
     IOStream STDIO          ->  LazyB.getContents
     IOStream (Path b)       ->  LazyB.readFile (Char8.unpack b)
-  return (TMPX (SHDAT size) text env rm0 rm1 rm2)
+  return (TMPX (SHDAT size) text env tmpdir rm0 rm1 rm2)
 
 
 openByteSource              ::  ByteSource -> IO LazyB.ByteString
