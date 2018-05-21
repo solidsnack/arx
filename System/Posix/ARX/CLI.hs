@@ -114,7 +114,8 @@ tmpxCheckStreams tars cmd    =  streamsMessage [tars', cmd']
     | cmd == IOStream STDIO  =  One "as a command input"
     | otherwise              =  Zero
 
-tmpxOpen :: Word -> [(Var, Val)] -> (Bool, Bool, Bool) -> ByteString -> ByteSource -> IO TMPX
+tmpxOpen :: Word -> [(Var, Val)] -> (Bool, Bool, Bool)
+         -> ByteString -> ByteSource -> IO TMPX
 tmpxOpen size env (rm0, rm1, rm2) tmpdir cmd = do
   text                      <-  case cmd of
     ByteString b            ->  return (LazyB.fromChunks [b])
