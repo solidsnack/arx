@@ -50,7 +50,7 @@ copyright = u'2011, Jason Dusek'
 # The short X.Y version.
 import subprocess
 version_cmd = ['sed', '-n', '/^version *:  */ { s/// ; p ;}', '../arx.cabal']
-version = subprocess.check_output(version_cmd).strip()
+version = subprocess.check_output(version_cmd).decode().strip()
 # The full version, including alpha/beta/rc tags.
 release = version
 
