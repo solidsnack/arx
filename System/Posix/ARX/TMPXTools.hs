@@ -57,7 +57,7 @@ render Template{..}          =  mconcat [ blaze a,
   blaze                      =  Blaze.fromByteString
   tf True                    =  "true"
   tf False                   =  "false"
-  a : b : c : d : e : f : [] = findChunks $(embedFile "./model-scripts/tmpx.sh")
+  a : b : c : d : e : [] = findChunks $(embedFile "./model-scripts/tmpx.sh")
 
 findChunks                  ::  ByteString -> [ByteString]
 findChunks                   =  coalesce . markHoles
