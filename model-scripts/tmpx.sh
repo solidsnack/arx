@@ -72,7 +72,7 @@ go () {
   fi
   if $run
   then
-    ( . ../env && exec ../run "$@" )
+    ( . ../env && exec -a "$0" ../run "$@" )
   fi
 }
 unpack_env () { : # NOOP
