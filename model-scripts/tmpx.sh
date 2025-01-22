@@ -3,7 +3,6 @@ set -e -u
 unset rm_ dir
 tmp=true ; run=true
 tmpdir= ; rm0=true ; rm1=true ; shared=false ; hash="" # To be set by tool.
-token=`date -u +%FT%TZ | tr -d :-`-`hexdump -n4 -e '"%08x"' </dev/urandom`
 opts() {
   cmd="$1" ; shift
   n=$#
@@ -41,6 +40,7 @@ opts() {
       rm_=false
       dir="$tmpdir"/tmpx-"$hash"
     else
+      token=`date -u +%FT%TZ | tr -d :-`-`hexdump -n4 -e '"%08x"' </dev/urandom`
       dir="$tmpdir"/tmpx-"$token"
     fi
     : ${rm_:=true}
