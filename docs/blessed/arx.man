@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "ARX" "1" "%F" "0.3.2" "arx"
+.TH "ARX" "1" "%F" "0.3.3" "arx"
 .SH NAME
 arx \- archived execution
 .SH SYNOPSIS

@@ -1,5 +1,4 @@
-cabal.project.local
-cabal.project.local~
+cabal.project.*
 dist/
 dist-newstyle/
 docs/.build
