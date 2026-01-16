@@ -24,7 +24,6 @@ import Numeric (showOct, showHex)
 
 import qualified Blaze.ByteString.Builder as Blaze
 import qualified Blaze.ByteString.Builder.Char8 as Blaze
-import qualified Data.ByteString.Nums.Careless as Bytes
 
 
 {-| A chunk describes a block of binary data ready for inclusion in a shell
