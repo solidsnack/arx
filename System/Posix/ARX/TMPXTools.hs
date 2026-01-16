@@ -79,4 +79,3 @@ markHoles                    =  map f . Bytes.lines
 
 isHole                      ::  ByteString -> Bool
 isHole line                  =  "# To be set by tool." `Bytes.isSuffixOf` line
-

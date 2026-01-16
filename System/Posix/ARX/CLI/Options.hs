@@ -174,4 +174,3 @@ slashes = listToMaybe . longestFirst . catMaybes <$> manyTill classify eof
   classify                   =  Just <$> satisfy slashRun <|> Nothing <$ anyArg
   longestFirst               =  sortBy (comparing (negate . Bytes.length))
   slashRun s                 =  Char8.all (== '/') s && Bytes.length s > 1
-

@@ -1,8 +1,5 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ARX" "1" "%F" "0.2.2" "arx"
-.SH NAME
-arx \- archived execution
 .
 .nr rst2man-indent-level 0
 .
@@ -30,19 +27,20 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
+.TH "ARX" "1" "%F" "0.3.2" "arx"
+.SH NAME
+arx \- archived execution
 .SH SYNOPSIS
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 arx (\-h | \-[?] | \-\-help)
 arx (\-v | \-\-version)
 arx shdat (\-b <size>)? (\-o <output file>)? < input
 arx shdat (\-b <size>)? (\-o <output file>)? <input file>+
 arx tmpx <option,archive>* (//+ <command> (//+ <option,archive>*)?)?
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .SH DESCRIPTION
@@ -79,11 +77,9 @@ execution context; for example:
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 arx tmpx ... | ssh user@host.com sudo sh
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -92,11 +88,9 @@ or command. To pass arguments when piping to \fIsh\fP, use \fI\-s\fP:
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 arx tmpx ... | ssh user@host.com sudo sh \-s a b c
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -172,13 +166,11 @@ all recognized:
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 arx tmpx  ...some args... // ...command...
 arx tmpx  ...some args... // ...command... // ...more args...
 arx tmpx // ...command... // ...some args...
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -217,8 +209,7 @@ redirected to the given path.
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 # Installer script that preserves failed builds.
 git archive HEAD | bzip2 | arx tmpx \-rm0 \- // make install > go.sh
 # Now install as root; but don\(aqt log in as root.
@@ -236,8 +227,7 @@ arx tmpx ./server\-build.tgz LD_DEBUG=files // ./bin/start | ssh ...
 # Test out Cabal source distribution of this package:
 arx tmpx // \(aqcd arx\-* && cabal configure && cabal build\(aq // \e
          \-rm0 ./dist/arx\-0.0.0.tar.gz | sh
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .SH PASSING ARGUMENTS TO GENERATED SCRIPTS
@@ -268,11 +258,9 @@ list:
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
+.EX
 a\-tmpx\-script.sh \-\-no\-rm // a b c \-\-extract
-.ft P
-.fi
+.EE
 .UNINDENT
 .UNINDENT
 .sp
@@ -282,11 +270,9 @@ the same way as \fBa\fP, \fBb\fP, \fBc\fP\&. The following example causes \fBab\
 .INDENT 0.0
 .INDENT 3.5
 .sp
-.nf
-.ft C
-arx tmpx // printf "\(aq%s\en\(aq" \(aq"$@"\(aq | sh \-s // ab c \-\-no\-rm
-.ft P
-.fi
+.EX
+arx tmpx // printf \(dq\(aq%s\en\(aq\(dq \(aq\(dq$@\(dq\(aq | sh \-s // ab c \-\-no\-rm
+.EE
 .UNINDENT
 .UNINDENT
 .SH NOTES
@@ -297,7 +283,7 @@ pathnames.
 .SH BUGS
 .sp
 The command line parser offers no hints or help of any kind; it fails with the
-simple message "argument error". The two most common mistakes I make are:
+simple message \(dqargument error\(dq. The two most common mistakes I make are:
 .INDENT 0.0
 .IP \(bu 2
 Not qualifying paths with \fB/\fP, \fB\&./\fP or \fB\&../\fP\&.

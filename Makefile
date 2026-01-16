@@ -52,9 +52,9 @@ ubuntu-build-deps:
 	  python-sphinx cabal-install
 	cabal install --only-dependencies
 
-tmp/arx.cabal: dist/build/arx/arx
+tmp/arx.cabal: cabal
 	mkdir -p tmp
-	cp dist/build/arx/arx $@
+	cp dist-newstyle/build/*/*/*/build/arx/arx $@
 	strip $@
 
 dist/build/arx/arx: cabal
@@ -67,5 +67,4 @@ doc:
 	cd docs && make blessed
 
 clean:
-	rm -rf tmp arx dist/build
-
+	rm -rf tmp arx dist-newstyle/build
