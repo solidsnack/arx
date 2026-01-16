@@ -188,4 +188,3 @@ size                         =  (*) <$> decimal <*> suffix
  -}
 sizeBounded :: forall b . (Bounded b, Integral b) => Parser b
 sizeBounded = fromInteger . min (toInteger (maxBound :: b)) <$> size
-

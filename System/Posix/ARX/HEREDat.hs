@@ -204,7 +204,7 @@ encoded                     ::  Chunk -> Bool
 encoded (SafeChunk _)        =  False
 encoded (EncodedChunk _ _ _ _) = True
 
-{-|  
+{-|
  -}
 script block                 =  mconcat $ case block of
   SafeChunk bytes           ->  [script (chunk bytes)] -- Convert to Encoded
@@ -241,4 +241,3 @@ script block                 =  mconcat $ case block of
   - more compact than base 64; but whether shell decoders can effectively
   - realize this efficiency is another matter.
   -}
-

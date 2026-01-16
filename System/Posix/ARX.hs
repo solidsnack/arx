@@ -10,4 +10,3 @@ module System.Posix.ARX (
 import System.Posix.ARX.Programs
 import System.Posix.ARX.Sh
 import System.Posix.ARX.Tar
-

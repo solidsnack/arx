@@ -12,7 +12,7 @@ function debs {
 }
 
 # Use the list of debs to weed out libraries in the libc package and then
-# search for static libraries that match the dynamic libs. 
+# search for static libraries that match the dynamic libs.
 function statics {
   debs "$1" | egrep -v libc[0-9]+ | cut -d' ' -f2 |
   sed -nr '/^.+[/]([^/]+)[.]so([.][0-9.]+)?$/ { s//\1.a/ ; p }' |

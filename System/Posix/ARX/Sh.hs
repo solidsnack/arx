@@ -66,4 +66,3 @@ class Render t where
 
 class Raw t where
   raw                       ::  t -> ByteString
-
