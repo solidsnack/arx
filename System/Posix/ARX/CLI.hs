@@ -181,4 +181,3 @@ err b | Char8.last b == '\n' =  Char8.hPutStr stderr b
       | otherwise            =  Char8.hPutStr stderr (b `Char8.snoc` '\n')
 
 die msg                      =  err msg >> exitFailure
-

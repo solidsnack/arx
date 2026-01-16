@@ -41,7 +41,7 @@ instance ARX SHDAT LazyB.ByteString where
       ("", "")              ->  []
       (a , "")              ->  [chunkIt a]
       (a ,  b)              ->  chunkIt a : chunked b
-     where  
+     where
       chunkIt                =  script . chunk . mconcat . LazyB.toChunks
 
 
@@ -78,5 +78,3 @@ instance ARX TMPX [(Tar, LazyB.ByteString)] where
                        [ ]  ->  ""
     shdat                    =  interpret encoder
     unblz                    =  Blaze.toLazyByteString
-
-

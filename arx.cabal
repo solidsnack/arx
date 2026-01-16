@@ -1,7 +1,8 @@
+cabal-version                 : 2.4
 name                          : arx
-version                       : 0.3.2
+version                       : 0.3.3
 category                      : Text
-license                       : BSD3
+license                       : BSD-3-Clause
 license-file                  : LICENSE
 author                        : Jason Dusek
 maintainer                    : oss@solidsnack.be
@@ -46,7 +47,6 @@ description                   :
   For each supported platform, there is an archive containing @arx@ and
   signature files (SHA 512 and GPG).
 
-cabal-version                 : >= 1.6
 build-type                    : Simple
 extra-source-files            : README
                               , LICENSE
