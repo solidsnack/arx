@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -o errexit -o nounset -o pipefail
 
 # Use LDD to find the shared libraries referenced by this executable.
